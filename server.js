@@ -1,7 +1,10 @@
 const http = require('http');
 const fs = require('fs');
 
-http.createServer((req, res) => {
+var WebSocketServer = require('websocket').server;
+
+const server = http.createServer((req, res) => {
+  console.log(req.url);
   if (req.url === '/') {
     fs.readFile('./public/index.html', (err, page) => {
       if (err) {
@@ -19,14 +22,30 @@ http.createServer((req, res) => {
 	res.end(JSON.stringify(err));
 	return;
       }
-      res.writeHead(200);
+      res.writeHead(200, {
+	'Content-Type': 'text/css'
+      });
       res.end(style);
     });        
-  } else if (req.url === '/game') {
-    res.writeHead(200);
-    res.end('game');
   } else {
     res.writeHead(404);
     res.end('Nothing here\n');
   }
-}).listen(8000);
+});
+
+server.listen(9898);
+
+const wsServer = new WebSocketServer({
+  httpServer: server
+});
+
+wsServer.on('request', function(request) {
+    const connection = request.accept(null, request.origin);
+    connection.on('message', function(message) {
+      console.log('Received Message:', message.utf8Data);
+      connection.sendUTF('Hi this is WebSocket server!');
+    });
+    connection.on('close', function(reasonCode, description) {
+        console.log('Client has disconnected.');
+    });
+});
