@@ -4,19 +4,19 @@
 
 <body>
   <div class="row">
-    <button class="square"></button>
-    <button class="square"></button>
-    <button class="square"></button>
+    <button class="square" id="0"></button>
+    <button class="square" id="1"></button>
+    <button class="square" id="2"></button>
   </div>
   <div class="row">
-    <button class="square"></button>
-    <button class="square"></button>
-    <button class="square"></button>
+    <button class="square" id="3"></button>
+    <button class="square" id="4"></button>
+    <button class="square" id="5"></button>
   </div>    
   <div class="row">
-    <button class="square"></button>
-    <button class="square"></button>
-    <button class="square"></button>
+    <button class="square" id="6"></button>
+    <button class="square" id="7"></button>
+    <button class="square" id="8"></button>
   </div>
 </body>
 
@@ -24,9 +24,17 @@
  const ws = new WebSocket('ws://localhost:9898/');
  ws.onopen = function() {
      console.log('WebSocket Client Connected');
-     ws.send('Hi this is web client.');
+     // ws.send('Hi this is web client.');
  };
- ws.onmessage = function(e) {
-     console.log("Received: '" + e.data + "'");
- };
+ // ws.onmessage = function(e) {
+ //     console.log("Received: '" + e.data + "'");
+  // };
+
+  let buttons = document.getElementsByTagName('button');
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('click', () => {
+      ws.send('client clicked ' + buttons[i].id);
+    });
+  }
+  
 </script>
