@@ -14,7 +14,19 @@ const server = http.createServer((req, res) => {
       res.writeHead(200);
       res.end(page);
     });
-  } else if(req.url === '/style.css') {
+  } else if (req.url === '/tictactoe.js') {
+    fs.readFile('./public/tictactoe.js', (err, script) => {
+      if (err) {
+	res.writeHead(404);
+	res.end(JSON.stringify(err));
+	return;
+      }
+      res.writeHead(200, {
+	'Content-Type': 'text/css'
+      });
+      res.end(script);
+    });
+  }  else if(req.url === '/style.css') {
     fs.readFile('./public/style.css', (err, style) => {
       if (err) {
 	res.writeHead(404);
@@ -41,15 +53,18 @@ const wsServer = new WebSocketServer({
 wsServer.on('request', function(request) {
   const connection = request.accept(null, request.origin);
   console.log('A client has connected');
-  connection.on('message', function(message) {
-    console.log('Received Message:', message.utf8Data);
-    //connection.sendUTF('Hi this is WebSocket server!');
+  //connection.sendUTF('hi this is server.');
+
+  connection.on('message', function(data) {
+    //mesage in data.utf8Data;
+
+
   });
   connection.on('close', function(reasonCode, description) {
     console.log('Client has disconnected.');
   });
 });
 
-const board = Array(9).fill(null);
+let board = Array(9).fill(null);
 
 
