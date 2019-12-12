@@ -2,6 +2,15 @@ const ws = new WebSocket('ws://localhost:9898/');
 ws.onopen = function() {
   console.log('WebSocket Client Connected');
   // ws.send('Hi this is web client.');
+
+  let username = window.prompt('Your Name:');
+  let room = window.prompt('Room (a three digit number):');;
+
+  ws.send(JSON.stringify({
+    type: 'joinRoom',
+    user: username,
+    room: room
+  }));
 };
 ws.onmessage = function(e) {
   //console.log(e.data);
@@ -14,9 +23,11 @@ ws.onmessage = function(e) {
 //   });
 // }
 
-let moves = [null, null, 'X',
+let moves = [null, null, null,
 	     null, null, null,
-	     'O', null, null];
+	     null, null, null];
+
+document.getElementById('board').appendChild(renderBoard(moves));
 
 function renderBoard(moves) {
   console.log('creating board');
@@ -37,5 +48,3 @@ function renderBoard(moves) {
   }
   return board;
 }
-
-document.getElementById('root').appendChild(renderBoard(moves));

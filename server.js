@@ -58,6 +58,7 @@ wsServer.on('request', function(request) {
   connection.on('message', function(data) {
     //mesage in data.utf8Data;
 
+    handleClientAction(data.utf8Data);
 
   });
   connection.on('close', function(reasonCode, description) {
@@ -65,6 +66,21 @@ wsServer.on('request', function(request) {
   });
 });
 
-let board = Array(9).fill(null);
+let state = {
+  rooms: []
+};
 
+//TODO
+function handleClientAction(action) {
+  if (action.type === 'joinRoom') {
+    if ( state.rooms.filter(action.room)[0] ) { //if room already exists
 
+    } else {
+
+    }
+  }
+  // action = JSON.parse(action);
+  // console.log(`received client action of type '${action.type}' for room ${action.room} from ${action.user}`);
+}
+
+//let board = Array(9).fill(null);
