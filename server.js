@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 
-var WebSocketServer = require('websocket').server;
+var WebSocket = require('ws');
 
 const server = http.createServer((req, res) => {
   if (req.url === '/') {
@@ -46,23 +46,15 @@ const server = http.createServer((req, res) => {
 
 server.listen(9898);
 
-const wsServer = new WebSocketServer({
-  httpServer: server
-});
+const wss = new WebSocket.Server({ server });
 
-wsServer.on('request', function(request) {
-  const connection = request.accept(null, request.origin);
-  console.log('A client has connected');
-  //connection.sendUTF('hi this is server.');
-
-  connection.on('message', function(data) {
-    //mesage in data.utf8Data;
-
-    handleClientAction(data.utf8Data);
-
+wss.on('connection', (ws) => {
+  ws.on('message', (action) => {
+    handleClientAction(JSON.parse(action));
   });
-  connection.on('close', function(reasonCode, description) {
-    console.log('Client has disconnected.');
+
+  ws.on('close', (e) => {
+    console.log('Client has disconnected');
   });
 });
 
