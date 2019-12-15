@@ -58,21 +58,39 @@ wss.on('connection', (ws) => {
   });
 });
 
-let state = {
-  rooms: []
-};
+let rooms = [{number: "666",
+	      users: ['gennarino']
+	     }];
 
 //TODO
 function handleClientAction(action) {
   if (action.type === 'joinRoom') {
-    if ( state.rooms.filter(action.room)[0] ) { //if room already exists
-
+    let room = roomExists(rooms, action.room);
+    if (room) {
+      if (room.users.length === 1) {
+	room.users.push(action.user);
+	console.log(room);
+      } else {
+	console.log('room is full');
+      }
     } else {
-
+      room = {
+      	number: action.room,
+      	users : [action.user]
+      };
+      rooms.push(room);
+      console.log(rooms);
     }
+  } else if (action.type === 'exitRoom') {
+    
   }
-  // action = JSON.parse(action);
-  // console.log(`received client action of type '${action.type}' for room ${action.room} from ${action.user}`);
 }
 
-//let board = Array(9).fill(null);
+function roomExists(rooms, number) {
+  return rooms.filter((room) => {
+    if (room.number === number)
+      return true;
+    else
+      return false;
+  })[0];
+};
