@@ -8,8 +8,8 @@ ws.onopen = function() {
 
   ws.send(JSON.stringify({
     type: 'joinRoom',
-    user: username,
-    room: room
+    room: room,
+    username: username
   }));
 };
 ws.onmessage = function(e) {
