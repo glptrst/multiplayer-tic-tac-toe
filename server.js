@@ -4,7 +4,9 @@ const fs = require('fs');
 var WebSocket = require('ws');
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/') {
+  switch (req.url) {
+
+  case '/':
     fs.readFile('./public/index.html', (err, page) => {
       if (err) {
 	res.writeHead(404);
@@ -14,7 +16,9 @@ const server = http.createServer((req, res) => {
       res.writeHead(200);
       res.end(page);
     });
-  } else if (req.url === '/tictactoe.js') {
+    break;
+
+  case '/tictactoe.js':
     fs.readFile('./public/tictactoe.js', (err, script) => {
       if (err) {
 	res.writeHead(404);
@@ -26,7 +30,9 @@ const server = http.createServer((req, res) => {
       });
       res.end(script);
     });
-  }  else if(req.url === '/style.css') {
+    break;
+
+  case '/style.css':
     fs.readFile('./public/style.css', (err, style) => {
       if (err) {
 	res.writeHead(404);
@@ -37,8 +43,10 @@ const server = http.createServer((req, res) => {
 	'Content-Type': 'text/css'
       });
       res.end(style);
-    });        
-  } else {
+    });
+    break;
+
+  default:
     res.writeHead(404);
     res.end('Nothing here\n');
   }
