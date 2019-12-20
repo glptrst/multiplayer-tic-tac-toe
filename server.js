@@ -71,12 +71,12 @@ wss.on('connection', (ws) => {
   ws.on('message', (action) => {
     action = JSON.parse(action);
     switch (action.type) {
+
     case 'joinRoom':
-      handleJoinRoomAction(action, ws);
+      joinRoom(action.username, action.room, ws);
       console.log(rooms);
       break;
-    case 'exitRoom':
-      break;
+
     default:
       console.log('? 1');
     }
@@ -101,7 +101,7 @@ wss.on('connection', (ws) => {
 	  rooms = r;
 	}
 	else if (rooms[i].users[1].ws === ws) {
-	  console.log(`${rooms[i].users[0].username} abandoned`);
+	  console.log(`${rooms[i].users[1].username} abandoned`);
 	  let r = rooms.slice();
 	  r[i].users.pop();
 	  rooms = r;
@@ -112,26 +112,27 @@ wss.on('connection', (ws) => {
   });
 });
 
-function handleJoinRoomAction(action, ws) {
-  if (!action.username || !action.room) {
+function joinRoom(username, roomNumber, ws) {
+  if (!username || !roomNumber) {
     console.log('Missing information');
     return;
   }
 
-  let room = roomExists(rooms, action.room);
+  let room = roomExists(rooms, roomNumber);
   if (!room) {
     rooms.push({
-      number: action.room,
-      users: [{ws: ws, username: action.username}]
+      number: roomNumber,
+      users: [{ws: ws, username: username}]
     });
   } else {
     if (room.users.length === 1) {
-      room.users.push({ws: ws, username: action.username});
+      room.users.push({ws: ws, username: username});
     } else {
       console.log('room is full');
     }
   }
 }
+
 
 function roomExists(rooms, number) {
   return rooms.filter((room) => {
