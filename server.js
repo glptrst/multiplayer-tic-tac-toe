@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 
-var WebSocket = require('ws');
+const WebSocket = require('ws');
 
 const server = http.createServer((req, res) => {
   switch (req.url) {
@@ -117,22 +117,23 @@ function joinRoom(username, roomNumber, ws) {
     console.log('Missing information');
     return;
   }
-
-  let room = roomExists(rooms, roomNumber);
+  let r = rooms.slice();
+  let room = roomExists(r, roomNumber);
   if (!room) {
-    rooms.push({
+    r.push({
       number: roomNumber,
       users: [{ws: ws, username: username}]
     });
+    rooms = r;
   } else {
     if (room.users.length === 1) {
       room.users.push({ws: ws, username: username});
+      rooms = r;
     } else {
       console.log('room is full');
     }
   }
 }
-
 
 function roomExists(rooms, number) {
   return rooms.filter((room) => {
