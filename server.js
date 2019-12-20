@@ -73,61 +73,63 @@ wss.on('connection', (ws) => {
     switch (action.type) {
     case 'joinRoom':
       handleJoinRoomAction(action, ws);
+      console.log(rooms);
       break;
     case 'exitRoom':
       break;
     default:
-      console.log('?');
+      console.log('? 1');
     }
   });
 
   ws.on('close', (e) => {
     console.log('Client has disconnected');
-    let room;
-    let username;
 
     for (let i = 0; i < rooms.length; i++) {
       if (rooms[i].users.length === 1) {
 	if (rooms[i].users[0].ws === ws) {
 	  console.log(`${rooms[i].users[0].username} abandoned`);
-	} else if (rooms[i].users.length === 2) {
-	  if (rooms[i].users[0].ws === ws)
-	    console.log(`${rooms[i].users[0].username} abandoned`);
-	  else if (rooms[i].users[1].ws === ws)
-	    console.log(`${rooms[i].users[0].username} abandoned`);
-	} else {
-	  console.log('?');
+	  let r = rooms.slice();
+	  r.splice(i, 1);
+	  rooms = r;
+	}
+      } else if (rooms[i].users.length === 2) {
+	if (rooms[i].users[0].ws === ws) {
+	  console.log(`${rooms[i].users[0].username} abandoned`);
+	  let r = rooms.slice();
+	  r[i].users.shift();
+	  rooms = r;
+	}
+	else if (rooms[i].users[1].ws === ws) {
+	  console.log(`${rooms[i].users[0].username} abandoned`);
+	  let r = rooms.slice();
+	  r[i].users.pop();
+	  rooms = r;
 	}
       }
     }
+    console.log(rooms);
   });
 });
 
 function handleJoinRoomAction(action, ws) {
-  let room = roomExists(rooms, action.room);
-  if (room) {
-    if (room.users.length === 1) {
-      console.log('one user present');
-      // room.users.push(action.user);
-      // console.log(room);
-    } else {
-      console.log('room is full');
-    }
-  } else { // if room does not exist
-    // room = {
-    //   number: action.room,
-    //   users : [action.user]
-    // };
-    // rooms.push(room);
-    // console.log(rooms);
+  if (!action.username || !action.room) {
+    console.log('Missing information');
+    return;
+  }
 
-    // let client = clients.filter((c) => {
-    //   return c === ws;
-    // })[0];
+  let room = roomExists(rooms, action.room);
+  if (!room) {
     rooms.push({
       number: action.room,
       users: [{ws: ws, username: action.username}]
     });
+  } else {
+    if (room.users.length === 1) {
+      room.users.push({ws: ws, username: action.username});
+    } else {
+      console.log('room is full');
+    }
   }
 }
 
