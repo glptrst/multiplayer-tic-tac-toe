@@ -77,6 +77,10 @@ wss.on('connection', (ws) => {
       console.log(rooms);
       break;
 
+    case 'move':
+      console.log(action);
+      break;
+
     default:
       console.log('? 1');
     }
@@ -84,25 +88,22 @@ wss.on('connection', (ws) => {
 
   ws.on('close', (e) => {
     console.log('Client has disconnected');
-
+    let r = rooms.slice();
     for (let i = 0; i < rooms.length; i++) {
       if (rooms[i].users.length === 1) {
 	if (rooms[i].users[0].ws === ws) {
 	  console.log(`${rooms[i].users[0].username} abandoned`);
-	  let r = rooms.slice();
 	  r.splice(i, 1);
 	  rooms = r;
 	}
       } else if (rooms[i].users.length === 2) {
 	if (rooms[i].users[0].ws === ws) {
 	  console.log(`${rooms[i].users[0].username} abandoned`);
-	  let r = rooms.slice();
 	  r[i].users.shift();
 	  rooms = r;
 	}
 	else if (rooms[i].users[1].ws === ws) {
 	  console.log(`${rooms[i].users[1].username} abandoned`);
-	  let r = rooms.slice();
 	  r[i].users.pop();
 	  rooms = r;
 	}

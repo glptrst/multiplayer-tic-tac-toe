@@ -1,11 +1,11 @@
 const ws = new WebSocket('ws://localhost:9898/');
+
+let username = window.prompt('Your Name:');
+let room = window.prompt('Room (a three digit number):');
+
 ws.onopen = function() {
   console.log('WebSocket Client Connected');
   // ws.send('Hi this is web client.');
-
-  let username = window.prompt('Your Name:');
-  let room = window.prompt('Room (a three digit number):');;
-
   ws.send(JSON.stringify({
     type: 'joinRoom',
     room: room,
@@ -15,13 +15,6 @@ ws.onopen = function() {
 ws.onmessage = function(e) {
   //console.log(e.data);
 };
-
-// let buttons = document.getElementsByTagName('button');
-// for (let i = 0; i < buttons.length; i++) {
-//   buttons[i].addEventListener('click', () => {
-//     ws.send(JSON.stringify({clicked: buttons[i].id}));
-//   });
-// }
 
 let moves = [null, null, null,
 	     null, null, null,
@@ -40,6 +33,7 @@ function renderBoard(moves) {
       console.log('creating square');
       let square = document.createElement('button');
       square.className = 'square';
+      square.id = squares+rows*3;
       let squareContent = document.createTextNode(moves[squares+rows*3] ? moves[squares+rows*3] : '');
       square.appendChild(squareContent);
       row.appendChild(square);
@@ -47,4 +41,16 @@ function renderBoard(moves) {
     board.appendChild(row);
   }
   return board;
+}
+
+let buttons = document.getElementsByTagName('button');
+for (let i = 0; i < buttons.length; i++) {
+  buttons[i].addEventListener('click', () => {
+    ws.send(JSON.stringify({
+      type: 'move',
+      square: buttons[i].id,
+      user: username,
+      room: room,
+    }));
+  });
 }
