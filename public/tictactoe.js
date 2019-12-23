@@ -1,5 +1,6 @@
 //const ws = new WebSocket('ws://localhost:9898/');
-const ws = ('wss://multiplayer-tictactoe.herokuapp.com/');
+const HOST = location.origin.replace(/^http/, 'ws');
+const ws = (HOST);
 
 let username = window.prompt('Your Name:');
 let roomNumber = window.prompt('Room (a three digit number):');
