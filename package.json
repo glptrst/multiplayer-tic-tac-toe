@@ -1,0 +1,23 @@
+{
+  "name": "multiplayer-tic-tac-toe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glptrst/multiplayer-tic-tac-toe.git"
+  },
+  "author": "Giulio Pietroiusti",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/glptrst/multiplayer-tic-tac-toe/issues"
+  },
+  "homepage": "https://github.com/glptrst/multiplayer-tic-tac-toe#readme",
+  "dependencies": {
+    "ws": "^7.2.1"
+  }
+}
