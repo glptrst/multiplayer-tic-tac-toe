@@ -68,17 +68,43 @@ let rooms = [
 ];
 
 wss.on('connection', (ws) => {
+
   ws.on('message', (action) => {
     action = JSON.parse(action);
     switch (action.type) {
 
     case 'joinRoom':
-      joinRoom(action.username, action.room, ws);
-      console.log(rooms);
+      joinRoom(action.username, action.roomNumber, ws);
+      //console.log(rooms);
       break;
 
     case 'move':
-      console.log(action);
+      let r = rooms.slice();
+      let room = roomExists(r, action.roomNumber);
+      let user = room.users.filter(u => u.ws === ws)[0];
+
+      // change rooms array
+      if (room.users.length === 2) {
+	console.log('length === 2');
+	if (room.next === user.mark) {
+	  console.log('room.next === user.mark');
+	  if (room.board[action.square] === null) {
+	    console.log('square != null');
+	    room.board[action.square] = user.mark;
+	    room.next = room.next === 'X' ? 'O' : 'X';
+	  }
+	}
+      }
+      rooms = r;
+
+      // send clients updated board
+      room.users.forEach(u => {
+	u.ws.send(JSON.stringify({
+	  type: 'update',
+	  board: room.board,
+	  status: winner(room.board) ? `${winner(room.board)} won` : `${room.next}'s turn`
+	}));
+      });
       break;
 
     default:
@@ -87,7 +113,7 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', (e) => {
-    console.log('Client has disconnected');
+    //console.log('Client has disconnected');
     let r = rooms.slice();
     for (let i = 0; i < rooms.length; i++) {
       if (rooms[i].users.length === 1) {
@@ -123,13 +149,30 @@ function joinRoom(username, roomNumber, ws) {
   if (!room) {
     r.push({
       number: roomNumber,
-      users: [{ws: ws, username: username}]
+      users: [{ws: ws, username: username, mark: 'X'}],
+      board: new Array(9).fill(null),
+      next: 'X',
+      status: 'Waiting for other player'
     });
     rooms = r;
+    ws.send(JSON.stringify({
+      type: 'update',
+      board: new Array(9).fill(null),
+      status: 'Waiting for other player'
+    }));
   } else {
     if (room.users.length === 1) {
-      room.users.push({ws: ws, username: username});
+      room.users.push({ws: ws, username: username, mark: 'O'});
+      room.status = `${room.next}'s turn`;
       rooms = r;
+
+      room.users.forEach(u => {
+	u.ws.send(JSON.stringify({
+	  type: 'update',
+	  board: new Array(9).fill(null),
+	  status: `${room.next}'s turn`
+	}));
+      });
     } else {
       console.log('room is full');
     }
@@ -144,3 +187,8 @@ function roomExists(rooms, number) {
       return false;
   })[0];
 };
+
+// TODO
+function winner(board) {
+  return false;
+}

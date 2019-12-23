@@ -1,26 +1,48 @@
 const ws = new WebSocket('ws://localhost:9898/');
 
 let username = window.prompt('Your Name:');
-let room = window.prompt('Room (a three digit number):');
+let roomNumber = window.prompt('Room (a three digit number):');
 
 ws.onopen = function() {
   console.log('WebSocket Client Connected');
   // ws.send('Hi this is web client.');
   ws.send(JSON.stringify({
     type: 'joinRoom',
-    room: room,
+    roomNumber: roomNumber,
     username: username
   }));
 };
 ws.onmessage = function(e) {
   //console.log(e.data);
+  let action = JSON.parse(e.data);
+
+  if (action.type === 'update') {
+    document.getElementById('board').textContent = '';
+    document.getElementById('board').appendChild(renderBoard(action.board));
+    let buttons = document.getElementsByTagName('button');
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', () => {
+	console.log('click');
+	ws.send(JSON.stringify({
+	  type: 'move',
+	  square: buttons[i].id,
+	  user: username,
+	  roomNumber: roomNumber,
+	}));
+      });
+    }
+
+    document.getElementById('status').textContent = '';
+    let status = document.createTextNode(action.status);
+    document.getElementById('status').appendChild((status));
+  }
 };
 
 let moves = [null, null, null,
 	     null, null, null,
 	     null, null, null];
 
-document.getElementById('board').appendChild(renderBoard(moves));
+//document.getElementById('board').appendChild(renderBoard(moves));
 
 function renderBoard(moves) {
   console.log('creating board');
@@ -41,16 +63,4 @@ function renderBoard(moves) {
     board.appendChild(row);
   }
   return board;
-}
-
-let buttons = document.getElementsByTagName('button');
-for (let i = 0; i < buttons.length; i++) {
-  buttons[i].addEventListener('click', () => {
-    ws.send(JSON.stringify({
-      type: 'move',
-      square: buttons[i].id,
-      user: username,
-      room: room,
-    }));
-  });
 }
