@@ -52,7 +52,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(9898);
+server.listen(process.env.PORT || 9898);
 
 const wss = new WebSocket.Server({ server });
 
