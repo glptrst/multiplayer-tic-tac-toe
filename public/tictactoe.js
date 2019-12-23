@@ -1,6 +1,6 @@
 //const ws = new WebSocket('ws://localhost:9898/');
 const HOST = location.origin.replace(/^http/, 'ws');
-const ws = (HOST);
+const ws = new WebSocket(HOST);
 
 let username = window.prompt('Your Name:');
 let roomNumber = window.prompt('Room (a three digit number):');
