@@ -84,14 +84,16 @@ wss.on('connection', (ws) => {
       let user = room.users.filter(u => u.ws === ws)[0];
 
       // change rooms array
-      if (room.users.length === 2) {
-	console.log('length === 2');
-	if (room.next === user.mark) {
-	  console.log('room.next === user.mark');
-	  if (room.board[action.square] === null) {
-	    console.log('square != null');
-	    room.board[action.square] = user.mark;
-	    room.next = room.next === 'X' ? 'O' : 'X';
+      if (!winner(room.board)) {
+	if (room.users.length === 2) {
+	  console.log('length === 2');
+	  if (room.next === user.mark) {
+	    console.log('room.next === user.mark');
+	    if (room.board[action.square] === null) {
+	      console.log('square != null');
+	      room.board[action.square] = user.mark;
+	      room.next = room.next === 'X' ? 'O' : 'X';
+	    }
 	  }
 	}
       }
@@ -188,7 +190,22 @@ function roomExists(rooms, number) {
   })[0];
 };
 
-// TODO
 function winner(board) {
-  return false;
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
+    }
+  }
+  return null;
 }
