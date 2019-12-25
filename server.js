@@ -57,14 +57,14 @@ server.listen(process.env.PORT || 9898);
 const wss = new WebSocket.Server({ server });
 
 let rooms = [
-  {
-    number: '666',
-    users: [{ws: {}, username: 'peppino'}]
-  },
-  {
-    number: '777',
-    users: [{ws: {}, username: 'Gianni'}, {ws: {}, username: 'Bernardo'}]
-  }
+  // {
+  //   number: '666',
+  //   users: [{ws: {}, username: 'peppino'}]
+  // },
+  // {
+  //   number: '777',
+  //   users: [{ws: {}, username: 'Gianni'}, {ws: {}, username: 'Bernardo'}]
+  // }
 ];
 
 wss.on('connection', (ws) => {
@@ -74,7 +74,7 @@ wss.on('connection', (ws) => {
     switch (action.type) {
 
     case 'joinRoom':
-      joinRoom(action.username, action.roomNumber, ws);
+      joinRoom(ws, action.roomNumber);
       //console.log(rooms);
       break;
 
@@ -86,11 +86,8 @@ wss.on('connection', (ws) => {
       // change rooms array
       if (!winner(room.board)) {
 	if (room.users.length === 2) {
-	  console.log('length === 2');
 	  if (room.next === user.mark) {
-	    console.log('room.next === user.mark');
 	    if (room.board[action.square] === null) {
-	      console.log('square != null');
 	      room.board[action.square] = user.mark;
 	      room.next = room.next === 'X' ? 'O' : 'X';
 	    }
@@ -120,18 +117,15 @@ wss.on('connection', (ws) => {
     for (let i = 0; i < rooms.length; i++) {
       if (rooms[i].users.length === 1) {
 	if (rooms[i].users[0].ws === ws) {
-	  console.log(`${rooms[i].users[0].username} abandoned`);
 	  r.splice(i, 1);
 	  rooms = r;
 	}
       } else if (rooms[i].users.length === 2) {
 	if (rooms[i].users[0].ws === ws) {
-	  console.log(`${rooms[i].users[0].username} abandoned`);
 	  r[i].users.shift();
 	  rooms = r;
 	}
 	else if (rooms[i].users[1].ws === ws) {
-	  console.log(`${rooms[i].users[1].username} abandoned`);
 	  r[i].users.pop();
 	  rooms = r;
 	}
@@ -141,9 +135,9 @@ wss.on('connection', (ws) => {
   });
 });
 
-function joinRoom(username, roomNumber, ws) {
-  if (!username || !roomNumber) {
-    console.log('Missing information');
+function joinRoom(ws, roomNumber) {
+  if (!roomNumber) {
+    console.log('Error: No room number given');
     return;
   }
   let r = rooms.slice();
@@ -151,7 +145,7 @@ function joinRoom(username, roomNumber, ws) {
   if (!room) {
     r.push({
       number: roomNumber,
-      users: [{ws: ws, username: username, mark: 'X'}],
+      users: [{ws: ws, mark: 'X'}],
       board: new Array(9).fill(null),
       next: 'X',
       status: 'Waiting for other player'
@@ -164,7 +158,7 @@ function joinRoom(username, roomNumber, ws) {
     }));
   } else {
     if (room.users.length === 1) {
-      room.users.push({ws: ws, username: username, mark: 'O'});
+      room.users.push({ws: ws, mark: 'O'});
       room.status = `${room.next}'s turn`;
       rooms = r;
 
