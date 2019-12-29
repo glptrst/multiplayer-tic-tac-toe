@@ -59,11 +59,11 @@ const wss = new WebSocket.Server({ server });
 let rooms = [
   // {
   //   number: '666',
-  //   users: [{ws: {}, username: 'peppino'}]
+  //   users: [{ws: {}, mark: 'X'}]
   // },
   // {
   //   number: '777',
-  //   users: [{ws: {}, username: 'Gianni'}, {ws: {}, username: 'Bernardo'}]
+  //   users: [{ws: {}, mark: 'X'}, {ws: {}, mark: 'O'}]
   // }
 ];
 
@@ -140,6 +140,13 @@ function joinRoom(ws, roomNumber) {
     console.log('Error: No room number given');
     return;
   }
+
+  if (! /^\d+$/.exec(roomNumber) ) {
+    console.log('Error: Room number must be an integer');
+    //TODO: send error to display in the client
+    return;
+  }
+
   let r = rooms.slice();
   let room = roomExists(r, roomNumber);
   if (!room) {

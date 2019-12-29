@@ -2,8 +2,7 @@
 const HOST = location.origin.replace(/^http/, 'ws');
 const ws = new WebSocket(HOST);
 
-//let username = window.prompt('Your Name:');
-let roomNumber = window.prompt('Room (a three digit number):');
+let roomNumber = window.prompt('Choose room number:');
 
 ws.onopen = function() {
   console.log('WebSocket Client Connected');
@@ -11,7 +10,6 @@ ws.onopen = function() {
   ws.send(JSON.stringify({
     type: 'joinRoom',
     roomNumber: roomNumber,
-    //username: username
   }));
 };
 ws.onmessage = function(e) {
@@ -28,7 +26,6 @@ ws.onmessage = function(e) {
 	ws.send(JSON.stringify({
 	  type: 'move',
 	  square: buttons[i].id,
-	  //user: username,
 	  roomNumber: roomNumber,
 	}));
       });
