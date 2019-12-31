@@ -142,8 +142,9 @@ function joinRoom(ws, roomNumber) {
   }
 
   if (! /^\d+$/.exec(roomNumber) ) {
-    console.log('Error: Room number must be an integer');
-    //TODO: send error to display in the client
+    ws.send(JSON.stringify({
+      type: 'room number error'
+    }));
     return;
   }
 

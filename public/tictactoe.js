@@ -34,6 +34,13 @@ ws.onmessage = function(e) {
     document.getElementById('status').textContent = '';
     let status = document.createTextNode(action.status);
     document.getElementById('status').appendChild((status));
+
+  } else if (action.type === 'room number error') {
+    roomNumber = window.prompt('You must insert a number:');
+    ws.send(JSON.stringify({
+      type: 'joinRoom',
+      roomNumber: roomNumber,
+    }));
   }
 };
 
