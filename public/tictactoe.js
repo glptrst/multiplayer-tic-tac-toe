@@ -30,9 +30,19 @@ ws.onmessage = function(e) {
     }
 
     document.getElementById('status').textContent = '';
-    let status = document.createTextNode(action.status);
+    let status = document.createTextNode(`Status of the game: ${action.status}`);
     document.getElementById('status').appendChild((status));
 
+    if (action.room) {
+      document.getElementById('room').textContent = '';
+      let roomText = document.createTextNode(`You are in room ${action.room}`);
+      document.getElementById('room').appendChild((roomText));
+    }
+    if (action.mark) {
+      document.getElementById('mark').textContent = '';
+      let markText = document.createTextNode(`Your mark is ${action.mark}`);
+      document.getElementById('mark').appendChild((markText));
+    }
   } else if (action.type === 'room number error') {
     roomNumber = window.prompt('You must insert a number:');
     ws.send(JSON.stringify({

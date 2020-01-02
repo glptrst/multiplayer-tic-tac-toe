@@ -75,7 +75,6 @@ wss.on('connection', (ws) => {
 
     case 'joinRoom':
       joinRoom(ws, action.roomNumber);
-      //console.log(rooms);
       break;
 
     case 'move':
@@ -112,7 +111,6 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', (e) => {
-    //console.log('Client has disconnected');
     let r = rooms.slice();
     for (let i = 0; i < rooms.length; i++) {
       if (rooms[i].users.length === 1) {
@@ -136,11 +134,6 @@ wss.on('connection', (ws) => {
 });
 
 function joinRoom(ws, roomNumber) {
-  if (!roomNumber) {
-    console.log('Error: No room number given');
-    return;
-  }
-
   if (! /^\d+$/.exec(roomNumber) ) {
     ws.send(JSON.stringify({
       type: 'room number error'
@@ -162,7 +155,9 @@ function joinRoom(ws, roomNumber) {
     ws.send(JSON.stringify({
       type: 'update',
       board: new Array(9).fill(null),
-      status: 'Waiting for other player'
+      status: 'Waiting for other player',
+      room: roomNumber,
+      mark: 'X'
     }));
   } else {
     if (room.users.length === 1) {
@@ -170,13 +165,18 @@ function joinRoom(ws, roomNumber) {
       room.status = `${room.next}'s turn`;
       rooms = r;
 
-      room.users.forEach(u => {
-	u.ws.send(JSON.stringify({
-	  type: 'update',
-	  board: new Array(9).fill(null),
-	  status: `${room.next}'s turn`
-	}));
-      });
+      room.users[0].ws.send(JSON.stringify({
+	type: 'update',
+	board: new Array(9).fill(null),
+	status: `${room.next}'s turn`
+      }));
+      room.users[1].ws.send(JSON.stringify({
+	type: 'update',
+	board: new Array(9).fill(null),
+	status: `${room.next}'s turn`,
+	room: roomNumber,
+	mark: 'O'
+      }));
     } else {
       ws.send(JSON.stringify({
 	type: 'room full'
