@@ -1,12 +1,10 @@
-//const ws = new WebSocket('ws://localhost:9898/');
+let roomNumber = window.prompt('Choose room number:');
+
 const HOST = location.origin.replace(/^http/, 'ws');
 const ws = new WebSocket(HOST);
 
-let roomNumber = window.prompt('Choose room number:');
-
 ws.onopen = function() {
   console.log('WebSocket Client Connected');
-  // ws.send('Hi this is web client.');
   ws.send(JSON.stringify({
     type: 'joinRoom',
     roomNumber: roomNumber,
@@ -37,6 +35,12 @@ ws.onmessage = function(e) {
 
   } else if (action.type === 'room number error') {
     roomNumber = window.prompt('You must insert a number:');
+    ws.send(JSON.stringify({
+      type: 'joinRoom',
+      roomNumber: roomNumber,
+    }));
+  } else if (action.type === 'room full') {
+    roomNumber = window.prompt('Room full, try another number:');
     ws.send(JSON.stringify({
       type: 'joinRoom',
       roomNumber: roomNumber,

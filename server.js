@@ -59,11 +59,11 @@ const wss = new WebSocket.Server({ server });
 let rooms = [
   // {
   //   number: '666',
-  //   users: [{ws: {}, mark: 'X'}]
+  //   users: [{ws: {...}, mark: 'X'}]
   // },
   // {
   //   number: '777',
-  //   users: [{ws: {}, mark: 'X'}, {ws: {}, mark: 'O'}]
+  //   users: [{ws: {...}, mark: 'X'}, {ws: {}, mark: 'O'}]
   // }
 ];
 
@@ -178,7 +178,9 @@ function joinRoom(ws, roomNumber) {
 	}));
       });
     } else {
-      console.log('room is full');
+      ws.send(JSON.stringify({
+	type: 'room full'
+      }));
     }
   }
 }
