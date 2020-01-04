@@ -112,24 +112,38 @@ wss.on('connection', (ws) => {
 
   ws.on('close', (e) => {
     let r = rooms.slice();
-    for (let i = 0; i < rooms.length; i++) {
-      if (rooms[i].users.length === 1) {
-	if (rooms[i].users[0].ws === ws) {
+    for (let i = 0; i < r.length; i++) {
+      if (r[i].users.length === 1) {
+	if (r[i].users[0].ws === ws) {
 	  r.splice(i, 1);
 	  rooms = r;
 	}
-      } else if (rooms[i].users.length === 2) {
-	if (rooms[i].users[0].ws === ws) {
+      } else if (r[i].users.length === 2) {
+	if (r[i].users[0].ws === ws) {
 	  r[i].users.shift();
+	  r[i].board = new Array(9).fill(null);
+	  r[i].status = 'Opponent left. Waiting for opponent.';
 	  rooms = r;
+	  r[i].users[0].ws.send(JSON.stringify({
+	    type: 'update',
+	    board: r[i].board,
+	    status: r[i].status
+	  }));
 	}
-	else if (rooms[i].users[1].ws === ws) {
+	else if (r[i].users[1].ws === ws) {
 	  r[i].users.pop();
+	  r[i].board = new Array(9).fill(null);
+	  r[i].status = 'Opponent left. Waiting for opponent.';
 	  rooms = r;
+	  r[i].users[0].ws.send(JSON.stringify({
+	    type: 'update',
+	    board: r[i].board,
+	    status: r[i].status
+	  }));
 	}
       }
     }
-    console.log(rooms);
+    //console.log(rooms);
   });
 });
 
