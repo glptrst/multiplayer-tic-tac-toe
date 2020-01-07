@@ -119,28 +119,19 @@ wss.on('connection', (ws) => {
 	  rooms = r;
 	}
       } else if (r[i].users.length === 2) {
-	if (r[i].users[0].ws === ws) {
+	if (r[i].users[0].ws === ws)
 	  r[i].users.shift();
-	  r[i].board = new Array(9).fill(null);
-	  r[i].status = 'Opponent left. Waiting for opponent.';
-	  rooms = r;
-	  r[i].users[0].ws.send(JSON.stringify({
-	    type: 'update',
-	    board: r[i].board,
-	    status: r[i].status
-	  }));
-	}
-	else if (r[i].users[1].ws === ws) {
+	else if (r[i].users[1].ws === ws)
 	  r[i].users.pop();
-	  r[i].board = new Array(9).fill(null);
-	  r[i].status = 'Opponent left. Waiting for opponent.';
-	  rooms = r;
-	  r[i].users[0].ws.send(JSON.stringify({
-	    type: 'update',
-	    board: r[i].board,
-	    status: r[i].status
-	  }));
-	}
+
+	r[i].board = new Array(9).fill(null);
+	r[i].status = 'Opponent left. Waiting for opponent.';
+	rooms = r;
+	r[i].users[0].ws.send(JSON.stringify({
+	  type: 'update',
+	  board: r[i].board,
+	  status: r[i].status
+	}));
       }
     }
     //console.log(rooms);

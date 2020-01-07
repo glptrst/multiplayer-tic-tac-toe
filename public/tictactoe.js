@@ -20,7 +20,6 @@ ws.onmessage = function(e) {
     let buttons = document.getElementsByTagName('button');
     for (let i = 0; i < buttons.length; i++) {
       buttons[i].addEventListener('click', () => {
-	console.log('click');
 	ws.send(JSON.stringify({
 	  type: 'move',
 	  square: buttons[i].id,
@@ -65,14 +64,11 @@ let moves = [null, null, null,
 //document.getElementById('board').appendChild(renderBoard(moves));
 
 function renderBoard(moves) {
-  console.log('creating board');
   let board = document.createElement('div');
   for (let rows = 0; rows < 3; rows++) {
-    console.log('creating row');
     let row = document.createElement('div');
     row.className = 'row';
     for (let squares = 0; squares < 3; squares++) {
-      console.log('creating square');
       let square = document.createElement('button');
       square.className = 'square';
       square.id = squares+rows*3;
