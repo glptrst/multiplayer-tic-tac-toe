@@ -166,7 +166,7 @@ function joinRoom(ws, roomNumber) {
     }));
   } else {
     if (room.users.length === 1) {
-      room.users.push({ws: ws, mark: 'O'});
+      room.users.push({ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'});
       room.status = `${room.next}'s turn`;
       rooms = r;
 
@@ -180,7 +180,7 @@ function joinRoom(ws, roomNumber) {
 	board: new Array(9).fill(null),
 	status: `${room.next}'s turn`,
 	room: roomNumber,
-	mark: 'O'
+	mark: room.users[0].mark === 'X' ? 'O' : 'X'
       }));
     } else {
       ws.send(JSON.stringify({
