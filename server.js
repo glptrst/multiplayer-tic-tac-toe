@@ -89,20 +89,18 @@ wss.on('connection', (ws) => {
 	    if (room.board[action.square] === null) {
 	      room.board[action.square] = user.mark;
 	      room.next = room.next === 'X' ? 'O' : 'X';
+	      rooms = r;
+	      room.users.forEach(u => {
+		u.ws.send(JSON.stringify({
+		  type: 'update',
+		  board: room.board,
+		  status: winner(room.board) ? `${winner(room.board)} won` : `${room.next}'s turn`
+		}));
+	      });
 	    }
 	  }
 	}
       }
-      rooms = r;
-
-      // send clients updated board
-      room.users.forEach(u => {
-	u.ws.send(JSON.stringify({
-	  type: 'update',
-	  board: room.board,
-	  status: winner(room.board) ? `${winner(room.board)} won` : `${room.next}'s turn`
-	}));
-      });
       break;
 
     default:
