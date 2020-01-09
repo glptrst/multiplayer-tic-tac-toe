@@ -1,3 +1,4 @@
+'use strict';
 let roomNumber = window.prompt('Choose room number:');
 
 const HOST = location.origin.replace(/^http/, 'ws');
@@ -41,6 +42,21 @@ ws.onmessage = function(e) {
       document.getElementById('mark').textContent = '';
       let markText = document.createTextNode(`Your mark is ${action.mark}`);
       document.getElementById('mark').appendChild((markText));
+    }
+    if (action.newGame) {
+      document.getElementById('status').textContent = '';
+      let status = document.createTextNode(`Status of the game: ${action.status}. `);
+      let link = document.createElement('span');
+      let linkTxt = document.createTextNode('Click here to start a new game');
+      link.appendChild(linkTxt);
+      document.getElementById('status').addEventListener('click', () => {
+	ws.send(JSON.stringify({
+	  type: 'newGame',
+	  roomNumber: roomNumber,
+	}));
+      });
+      document.getElementById('status').appendChild((status));
+      document.getElementById('status').appendChild((link));
     }
   } else if (action.type === 'room number error') {
     roomNumber = window.prompt('You must insert a number:');

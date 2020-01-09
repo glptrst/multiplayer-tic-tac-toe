@@ -1,3 +1,4 @@
+'use strict';
 const http = require('http');
 const fs = require('fs');
 
@@ -94,13 +95,18 @@ wss.on('connection', (ws) => {
 		u.ws.send(JSON.stringify({
 		  type: 'update',
 		  board: room.board,
-		  status: winner(room.board) ? `${winner(room.board)} won` : `${room.next}'s turn`
+		  status: winner(room.board) ? `${winner(room.board)} won` : `${room.next}'s turn`,
+		  newGame: winner(room.board)
 		}));
 	      });
 	    }
 	  }
 	}
       }
+      break;
+
+    case 'newGame':
+      //TODO
       break;
 
     default:
