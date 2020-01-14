@@ -69,16 +69,13 @@ let rooms = [
 ];
 
 wss.on('connection', (ws) => {
-
   ws.on('message', (action) => {
+
     action = JSON.parse(action);
-    switch (action.type) {
 
-    case 'joinRoom':
+    if (action.type === 'joinRoom') {
       joinRoom(ws, action.roomNumber);
-      break;
-
-    case 'move':
+    } else if (action.type === 'move')  {
       let r = rooms.slice();
       let room = roomExists(r, action.roomNumber);
       let user = room.users.filter(u => u.ws === ws)[0];
@@ -103,16 +100,29 @@ wss.on('connection', (ws) => {
 	  }
 	}
       }
-      break;
+      } else if (action.type === 'newGame') {
+	//TODO
+	let r = rooms.slice();
+	let room = roomExists(r, action.roomNumber);
+	//let user = room.users.filter(u => u.ws === ws)[0];
 
-    case 'newGame':
-      //TODO
-      break;
+	room.board = new Array(9).fill(null);
+	room.status = room.status = `${room.next}'s turn`;
 
-    default:
-      console.log('? 1');
-    }
-  });
+	room.users.forEach((u) => {
+	  u.ws.send(JSON.stringify({
+	    type: 'resetBoard',
+	    board: room.board,
+	    status: room.status
+	  }));
+	});
+	
+	rooms = r;
+
+      } else {
+	console.log('? 1');
+      }
+    });
 
   ws.on('close', (e) => {
     let r = rooms.slice();

@@ -58,6 +58,23 @@ ws.onmessage = function(e) {
       document.getElementById('status').appendChild((status));
       document.getElementById('status').appendChild((link));
     }
+  } else if ('resetBoard') {
+    document.getElementById('board').textContent = '';
+    document.getElementById('board').appendChild(renderBoard(action.board));
+    let buttons = document.getElementsByTagName('button');
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', () => {
+	ws.send(JSON.stringify({
+	  type: 'move',
+	  square: buttons[i].id,
+	  roomNumber: roomNumber,
+	}));
+      });
+    }
+
+    document.getElementById('status').textContent = '';
+    let status = document.createTextNode(`New Game started! ${action.status}`);
+    document.getElementById('status').appendChild((status));
   } else if (action.type === 'room number error') {
     roomNumber = window.prompt('You must insert a number:');
     ws.send(JSON.stringify({
