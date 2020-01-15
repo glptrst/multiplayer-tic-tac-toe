@@ -27,7 +27,7 @@ const server = http.createServer((req, res) => {
 	return;
       }
       res.writeHead(200, {
-	'Content-Type': 'text/css'
+	'Content-Type': 'text/javscript'
       });
       res.end(script);
     });
