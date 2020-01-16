@@ -5,9 +5,7 @@ const fs = require('fs');
 const WebSocket = require('ws');
 
 const server = http.createServer((req, res) => {
-  switch (req.url) {
-
-  case '/':
+  if (req.url === '/') {
     fs.readFile('./public/index.html', (err, page) => {
       if (err) {
 	res.writeHead(404);
@@ -17,9 +15,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(200);
       res.end(page);
     });
-    break;
-
-  case '/tictactoe.js':
+  } else if (req.url === '/tictactoe.js') {
     fs.readFile('./public/tictactoe.js', (err, script) => {
       if (err) {
 	res.writeHead(404);
@@ -31,9 +27,7 @@ const server = http.createServer((req, res) => {
       });
       res.end(script);
     });
-    break;
-
-  case '/style.css':
+  } else if (req.url === '/style.css') {
     fs.readFile('./public/style.css', (err, style) => {
       if (err) {
 	res.writeHead(404);
@@ -45,9 +39,7 @@ const server = http.createServer((req, res) => {
       });
       res.end(style);
     });
-    break;
-
-  default:
+  } else {
     res.writeHead(404);
     res.end('Nothing here\n');
   }
@@ -101,10 +93,8 @@ wss.on('connection', (ws) => {
 	}
       }
       } else if (action.type === 'newGame') {
-	//TODO
 	let r = rooms.slice();
 	let room = roomExists(r, action.roomNumber);
-	//let user = room.users.filter(u => u.ws === ws)[0];
 
 	room.board = new Array(9).fill(null);
 	room.status = room.status = `${room.next}'s turn`;
@@ -116,7 +106,7 @@ wss.on('connection', (ws) => {
 	    status: room.status
 	  }));
 	});
-	
+
 	rooms = r;
 
       } else {
@@ -148,7 +138,6 @@ wss.on('connection', (ws) => {
 	}));
       }
     }
-    //console.log(rooms);
   });
 });
 

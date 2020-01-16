@@ -94,8 +94,6 @@ let moves = [null, null, null,
 	     null, null, null,
 	     null, null, null];
 
-//document.getElementById('board').appendChild(renderBoard(moves));
-
 function renderBoard(moves) {
   let board = document.createElement('div');
   for (let rows = 0; rows < 3; rows++) {
