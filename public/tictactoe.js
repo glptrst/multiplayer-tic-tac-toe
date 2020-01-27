@@ -59,7 +59,7 @@ function startApp(roomNumber) {
 	let link = document.createElement('span');
 	let linkTxt = document.createTextNode('Click here to start a new game');
 	link.appendChild(linkTxt);
-	document.getElementById('status').addEventListener('click', () => {
+	link.addEventListener('click', () => {
 	  ws.send(JSON.stringify({
 	    type: 'newGame',
 	    roomNumber: roomNumber,
