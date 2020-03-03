@@ -8,8 +8,6 @@ document.getElementById('roomButton').addEventListener('click', () => {
   startApp(roomNumber);
 });
 
-//let roomNumber = window.prompt('Choose room number:');
-
 function startApp(roomNumber) {
   const HOST = location.origin.replace(/^http/, 'ws');
   const ws = new WebSocket(HOST);
@@ -28,7 +26,7 @@ function startApp(roomNumber) {
     if (action.type === 'update') {
       document.getElementById('board').textContent = '';
       document.getElementById('board').appendChild(renderBoard(action.board));
-      let buttons = document.getElementsByTagName('button');
+      let buttons = document.getElementsByClassName('square');
       for (let i = 0; i < buttons.length; i++) {
 	buttons[i].addEventListener('click', () => {
 	  ws.send(JSON.stringify({
@@ -71,7 +69,7 @@ function startApp(roomNumber) {
     } else if ('resetBoard') {
       document.getElementById('board').textContent = '';
       document.getElementById('board').appendChild(renderBoard(action.board));
-      let buttons = document.getElementsByTagName('button');
+      let buttons = document.getElementsByClassName('square');
       for (let i = 0; i < buttons.length; i++) {
 	buttons[i].addEventListener('click', () => {
 	  ws.send(JSON.stringify({
@@ -105,20 +103,18 @@ function startApp(roomNumber) {
 	       null, null, null];
 }
 
-
-
 function renderBoard(moves) {
-  let board = document.createElement('div');
+  let board = document.createElement('table');
   for (let rows = 0; rows < 3; rows++) {
-    let row = document.createElement('div');
-    row.className = 'row';
-    for (let squares = 0; squares < 3; squares++) {
-      let square = document.createElement('button');
-      square.className = 'square';
-      square.id = squares+rows*3;
-      let squareContent = document.createTextNode(moves[squares+rows*3] ? moves[squares+rows*3] : '');
-      square.appendChild(squareContent);
-      row.appendChild(square);
+    let row = document.createElement('tr');
+    row.className= 'row';
+    for (let cells = 0; cells < 3; cells++) {
+      let cell = document.createElement('td');
+      cell.className = 'square';
+      cell.id = cells+rows*3;
+      let cellContent = document.createTextNode(moves[cells+rows*3] ? moves[cells+rows*3] : '');
+      cell.appendChild(cellContent);
+      row.appendChild(cell);
     }
     board.appendChild(row);
   }

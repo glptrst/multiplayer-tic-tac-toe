@@ -92,27 +92,27 @@ wss.on('connection', (ws) => {
 	  }
 	}
       }
-      } else if (action.type === 'newGame') {
-	let r = rooms.slice();
-	let room = roomExists(r, action.roomNumber);
+    } else if (action.type === 'newGame') {
+      let r = rooms.slice();
+      let room = roomExists(r, action.roomNumber);
 
-	room.board = new Array(9).fill(null);
-	room.status = room.status = `${room.next}'s turn`;
+      room.board = new Array(9).fill(null);
+      room.status = room.status = `${room.next}'s turn`;
 
-	room.users.forEach((u) => {
-	  u.ws.send(JSON.stringify({
-	    type: 'resetBoard',
-	    board: room.board,
-	    status: room.status
-	  }));
-	});
+      room.users.forEach((u) => {
+	u.ws.send(JSON.stringify({
+	  type: 'resetBoard',
+	  board: room.board,
+	  status: room.status
+	}));
+      });
 
-	rooms = r;
+      rooms = r;
 
-      } else {
-	console.log('? 1');
-      }
-    });
+    } else {
+      console.log('? 1');
+    }
+  });
 
   ws.on('close', (e) => {
     let r = rooms.slice();

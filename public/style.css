@@ -1,11 +1,36 @@
 body {
     text-align: center;
-    background-color: rgb(174, 235, 188)
+    background-color: #b0ada4;
 }
 
-#board {
+table {
+    border-collapse: collapse;
     margin: 0 auto;
+}
+
+td {
+    border: 2px solid black;
+    height: 100px;
     width: 100px;
+    text-align: center;
+    vertical-align: middle;
+    font-family: "Comis Sans MS", cursive, sans-serif;
+    font-size: 70px;
+    cursor: pointer;
+}
+
+/* remove borders */
+table tr:first-child td {
+    border-top: 0;
+}
+table tr:last-child td {
+    border-bottom: 0;
+}
+table tr td:first-child {
+    border-left: 0;
+}
+table tr td:last-child {
+    border-right: 0;
 }
 
 .modal-bg {
@@ -37,21 +62,6 @@ body {
     clear: both;
     content: "";
     display: table;
-}
-
-.square {
-    background: #fff;
-    border: 1px solid #999;
-    float: left;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 34px;
-    height: 34px;
-    margin-right: -1px;
-    margin-top: -1px;
-    padding: 0;
-    text-align: center;
-    width: 34px;
 }
 
 #status{
