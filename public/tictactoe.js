@@ -8,6 +8,13 @@ document.getElementById('roomButton').addEventListener('click', () => {
   startApp(roomNumber);
 });
 
+document.getElementsByClassName("modal-bg")[0].addEventListener("keyup", (event) => {
+  event.preventDefault();
+  if (event.keyCode === 13) {
+    document.getElementById("roomButton").click();
+  }
+});
+
 function startApp(roomNumber) {
   const HOST = location.origin.replace(/^http/, 'ws');
   const ws = new WebSocket(HOST);
