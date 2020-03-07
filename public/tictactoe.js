@@ -73,7 +73,7 @@ function startApp(roomNumber) {
 	document.getElementById('status').appendChild((status));
 	document.getElementById('status').appendChild((link));
       }
-    } else if ('resetBoard') {
+    } else if (action.type === 'resetBoard') {
       document.getElementById('board').textContent = '';
       document.getElementById('board').appendChild(renderBoard(action.board));
       let buttons = document.getElementsByClassName('square');
