@@ -91,17 +91,11 @@ function startApp(roomNumber) {
       let status = document.createTextNode(`New Game started! ${action.status}`);
       document.getElementById('status').appendChild((status));
     } else if (action.type === 'room number error') {
-      roomNumber = window.prompt('You must insert a number:');
-      ws.send(JSON.stringify({
-	type: 'joinRoom',
-	roomNumber: roomNumber,
-      }));
+      document.querySelector('.modal-bg').style.display = '';
+      document.getElementById('error-message').textContent = 'Please, insert a number';
     } else if (action.type === 'room full') {
-      roomNumber = window.prompt('Room full, try another number:');
-      ws.send(JSON.stringify({
-	type: 'joinRoom',
-	roomNumber: roomNumber,
-      }));
+      document.querySelector('.modal-bg').style.display = '';
+      document.getElementById('error-message').textContent = 'Room full, try another number.';
     }
   };
 
