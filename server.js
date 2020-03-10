@@ -4,6 +4,9 @@ const fs = require('fs');
 
 const WebSocket = require('ws');
 
+/*             */
+/* HTTP SERVER */
+/*             */
 const server = http.createServer((req, res) => {
   if (req.url === '/') {
     fs.readFile('./public/index.html', (err, page) => {
@@ -47,6 +50,9 @@ const server = http.createServer((req, res) => {
 
 server.listen(process.env.PORT || 9898);
 
+/*                  */
+/* WEBSOCKET SERVER */
+/*                  */
 const wss = new WebSocket.Server({ server });
 
 let rooms = [
@@ -84,8 +90,8 @@ wss.on('connection', (ws) => {
 		u.ws.send(JSON.stringify({
 		  type: 'update',
 		  board: room.board,
-		  status: winner(room.board) ? `${winner(room.board)} won` : `${room.next}'s turn`,
-		  newGame: winner(room.board)
+		  status: winner(room.board) ? `${winner(room.board).mark} won` : `${room.next}'s turn`,
+		  winner: winner(room.board)
 		}));
 	      });
 	    }
@@ -216,7 +222,7 @@ function winner(board) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
+      return {mark: board[a], positions: lines[i]};
     }
   }
   return null;

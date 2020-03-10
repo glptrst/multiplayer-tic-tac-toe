@@ -8,6 +8,7 @@ document.getElementById('roomButton').addEventListener('click', () => {
   startApp(roomNumber);
 });
 
+// click #roomButton when pressing the Return Key
 document.getElementsByClassName("modal-bg")[0].addEventListener("keyup", (event) => {
   event.preventDefault();
   if (event.keyCode === 13) {
@@ -58,7 +59,11 @@ function startApp(roomNumber) {
 	let markText = document.createTextNode(`Your mark is ${action.mark}`);
 	document.getElementById('mark').appendChild((markText));
       }
-      if (action.newGame) {
+      if (action.winner) {
+	action.winner.positions.forEach((p) => {
+	  document.getElementById(p).style.color = 'red';
+	});
+
 	document.getElementById('status').textContent = '';
 	let status = document.createTextNode(`Status of the game: ${action.status}. `);
 	let link = document.createElement('span');
