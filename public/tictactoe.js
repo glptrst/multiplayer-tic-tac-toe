@@ -46,12 +46,12 @@ function startApp(roomNumber) {
       }
 
       document.getElementById('status').textContent = '';
-      let status = document.createTextNode(`Status of the game: ${action.status}`);
+      let status = document.createTextNode(`${action.status}`);
       document.getElementById('status').appendChild((status));
 
       if (action.room) {
 	document.getElementById('room').textContent = '';
-	let roomText = document.createTextNode(`You are in room ${action.room}`);
+	let roomText = document.createTextNode(`ROOM ${action.room}`);
 	document.getElementById('room').appendChild((roomText));
       }
       if (action.mark) {
@@ -65,7 +65,7 @@ function startApp(roomNumber) {
 	});
 
 	document.getElementById('status').textContent = '';
-	let status = document.createTextNode(`Status of the game: ${action.status}. `);
+	let status = document.createTextNode(`${action.status}.`);
 	let link = document.createElement('span');
 	let linkTxt = document.createTextNode('Click here to start a new game');
 	link.appendChild(linkTxt);

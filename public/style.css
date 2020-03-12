@@ -1,11 +1,15 @@
 body {
-    text-align: center;
     background-color: #b0ada4;
 }
 
 table {
     border-collapse: collapse;
     margin: 0 auto;
+}
+
+#status {
+    margin-top: 50px;
+    text-align: center;
 }
 
 td {
