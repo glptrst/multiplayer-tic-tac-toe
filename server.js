@@ -58,11 +58,15 @@ const wss = new WebSocket.Server({ server });
 let rooms = [
   // {
   //   number: '666',
+  //   next: 'X',
   //   users: [{ws: {...}, mark: 'X'}]
+  //   board: ...
   // },
   // {
   //   number: '777',
+  //   next: 'O',
   //   users: [{ws: {...}, mark: 'X'}, {ws: {}, mark: 'O'}]
+  //   board: ...
   // }
 ];
 
@@ -90,7 +94,7 @@ wss.on('connection', (ws) => {
 		u.ws.send(JSON.stringify({
 		  type: 'update',
 		  board: room.board,
-		  status: winner(room.board) ? `${winner(room.board).mark} won` : `${room.next}'s turn`,
+		  //status: winner(room.board) ? `${winner(room.board).mark} won` : `${room.next}'s turn`,
 		  winner: winner(room.board)
 		}));
 	      });
@@ -103,13 +107,13 @@ wss.on('connection', (ws) => {
       let room = roomExists(r, action.roomNumber);
 
       room.board = new Array(9).fill(null);
-      room.status = room.status = `${room.next}'s turn`;
+      //room.status = `${room.next}'s turn`;
 
       room.users.forEach((u) => {
 	u.ws.send(JSON.stringify({
 	  type: 'resetBoard',
 	  board: room.board,
-	  status: room.status
+	  //status: room.status
 	}));
       });
 
@@ -135,12 +139,15 @@ wss.on('connection', (ws) => {
 	  r[i].users.pop();
 
 	r[i].board = new Array(9).fill(null);
-	r[i].status = 'Opponent left. Waiting for opponent.';
+	//r[i].status = 'Opponent left. Waiting for opponent.';
+	//TODO: communicate to client that opponent left without using the status
+	r[i].opponentLeft = true;
 	rooms = r;
 	r[i].users[0].ws.send(JSON.stringify({
 	  type: 'update',
 	  board: r[i].board,
-	  status: r[i].status
+	  //status: r[i].status
+	  opponentLeft: r[i].opponentLeft
 	}));
       }
     }
@@ -148,7 +155,7 @@ wss.on('connection', (ws) => {
 });
 
 function joinRoom(ws, roomNumber) {
-  if (! /^\d+$/.exec(roomNumber) ) {
+  if (! /^\d+$/.exec(roomNumber)) {//check whether input is a number
     ws.send(JSON.stringify({
       type: 'room number error'
     }));
@@ -163,31 +170,32 @@ function joinRoom(ws, roomNumber) {
       users: [{ws: ws, mark: 'X'}],
       board: new Array(9).fill(null),
       next: 'X',
-      status: 'Waiting for other player'
+      //status: 'Waiting for other player'
+      //TODO: communicate to client that they're wating for the opponent without using staus
     });
     rooms = r;
     ws.send(JSON.stringify({
       type: 'update',
       board: new Array(9).fill(null),
-      status: 'Waiting for other player',
+      //status: 'Waiting for other player',
       room: roomNumber,
       mark: 'X'
     }));
   } else {
     if (room.users.length === 1) {
       room.users.push({ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'});
-      room.status = `${room.next}'s turn`;
+      //room.status = `${room.next}'s turn`;
       rooms = r;
 
       room.users[0].ws.send(JSON.stringify({
 	type: 'update',
 	board: new Array(9).fill(null),
-	status: `${room.next}'s turn`
+	//status: `${room.next}'s turn`
       }));
       room.users[1].ws.send(JSON.stringify({
 	type: 'update',
 	board: new Array(9).fill(null),
-	status: `${room.next}'s turn`,
+	//status: `${room.next}'s turn`,
 	room: roomNumber,
 	mark: room.users[0].mark === 'X' ? 'O' : 'X'
       }));

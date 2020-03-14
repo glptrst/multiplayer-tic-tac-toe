@@ -46,7 +46,8 @@ function startApp(roomNumber) {
       }
 
       document.getElementById('status').textContent = '';
-      let status = document.createTextNode(`${action.status}`);
+      //let status = document.createTextNode(`${action.status}`);
+      let status = document.createTextNode(`${'TODO'}`);
       document.getElementById('status').appendChild((status));
 
       if (action.room) {
@@ -65,7 +66,8 @@ function startApp(roomNumber) {
 	});
 
 	document.getElementById('status').textContent = '';
-	let status = document.createTextNode(`${action.status}.`);
+	//let status = document.createTextNode(`${action.status}.`);
+	let status = document.createTextNode(`${"there's a winner..."}`);
 	let link = document.createElement('span');
 	let linkTxt = document.createTextNode('Click here to start a new game');
 	link.appendChild(linkTxt);
@@ -93,7 +95,8 @@ function startApp(roomNumber) {
       }
 
       document.getElementById('status').textContent = '';
-      let status = document.createTextNode(`New Game started! ${action.status}`);
+      //let status = document.createTextNode(`New Game started! ${action.status}`);
+      let status = document.createTextNode('new game!');
       document.getElementById('status').appendChild((status));
     } else if (action.type === 'room number error') {
       document.querySelector('.modal-bg').style.display = '';
