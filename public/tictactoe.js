@@ -1,5 +1,7 @@
 'use strict';
 
+(() => {
+
 let roomNumber;
 
 document.getElementById('roomButton').addEventListener('click', () => {
@@ -129,3 +131,5 @@ function renderBoard(moves) {
   }
   return board;
 }
+
+})();
