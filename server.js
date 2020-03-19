@@ -75,8 +75,10 @@ wss.on('connection', (ws) => {
 
     action = JSON.parse(action);
 
-    if (action.type === 'joinRoom') {
-      joinRoom(ws, action.roomNumber);
+    console.log(action.type);
+
+    if (action.type === 'connection') {
+      connect(ws, action.roomNumber);
     } else if (action.type === 'move')  {
       let r = rooms.slice();
       let room = roomExists(r, action.roomNumber);
@@ -154,7 +156,7 @@ wss.on('connection', (ws) => {
   });
 });
 
-function joinRoom(ws, roomNumber) {
+function connect(ws, roomNumber) {
   if (! /^\d+$/.exec(roomNumber)) {//check whether input is a number
     ws.send(JSON.stringify({
       type: 'room number error'
@@ -164,41 +166,34 @@ function joinRoom(ws, roomNumber) {
 
   let r = rooms.slice();
   let room = roomExists(r, roomNumber);
+
   if (!room) {
-    r.push({
-      number: roomNumber,
-      users: [{ws: ws, mark: 'X'}],
-      board: new Array(9).fill(null),
-      next: 'X',
-      //status: 'Waiting for other player'
-      //TODO: communicate to client that they're wating for the opponent without using staus
-    });
+    room = new Room( roomNumber,
+		     [{ws: ws, mark: 'X'}],
+		     new Array(9).fill(null),
+		     'X' );
+    r.push(room);
     rooms = r;
     ws.send(JSON.stringify({
-      type: 'update',
-      board: new Array(9).fill(null),
-      //status: 'Waiting for other player',
-      room: roomNumber,
-      mark: 'X'
+      type: 'create room',
+      room: room.hideWs()
     }));
   } else {
     if (room.users.length === 1) {
-      room.users.push({ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'});
-      //room.status = `${room.next}'s turn`;
+      room.update({users: [room.users[0], {ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'}]});
       rooms = r;
+      room.users[0].ws.send(JSON.stringify({ //an opponent is joining the client's room
+	type: 'second user access',
+	room: room
+      }));
 
-      room.users[0].ws.send(JSON.stringify({
-	type: 'update',
-	board: new Array(9).fill(null),
-	//status: `${room.next}'s turn`
-      }));
-      room.users[1].ws.send(JSON.stringify({
-	type: 'update',
-	board: new Array(9).fill(null),
-	//status: `${room.next}'s turn`,
-	room: roomNumber,
-	mark: room.users[0].mark === 'X' ? 'O' : 'X'
-      }));
+      room = new Room(room.number, room.users, room.board, room.next);
+      room.users[1].ws.send(JSON.stringify( //client is joining an opponent's room
+	{
+	  type: 'join existing room',
+	  room: room.hideWs()
+	}
+      ));
     } else {
       ws.send(JSON.stringify({
 	type: 'room full'
@@ -234,4 +229,31 @@ function winner(board) {
     }
   }
   return null;
+}
+
+class Room {
+  constructor(number, users, board, next) {
+    this.number = number;
+    this.users = users;
+    this.board = board;
+    this.next = next;
+  }
+  update(config) {
+    return Object.assign(this, config);
+  }
+  hideWs () { // create copy of room without ws data
+    return new Room(this.number,
+		    this.users
+		    ?
+		    this.users.length === 1
+		    ?
+		    [ {ws: 'hidden', mark: this.users[0].mark}]
+		    :
+		    [
+		      {ws: 'hidden', mark: this.users[0].mark},
+		      {ws: 'hidden', mark: this.users[1].mark}
+		    ]
+		    : this.users,
+		    this.board, this.next);
+  }
 }

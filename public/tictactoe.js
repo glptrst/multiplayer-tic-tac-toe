@@ -2,6 +2,7 @@
 
 (() => {
 
+  let mark;
   let roomNumber;
 
   document.getElementById('roomButton').addEventListener('click', () => {
@@ -25,7 +26,7 @@
     ws.onopen = function() {
       console.log('WebSocket Client Connected');
       ws.send(JSON.stringify({
-	type: 'joinRoom',
+	type: 'connection',
 	roomNumber: roomNumber,
       }));
     };
@@ -33,7 +34,81 @@
       //console.log(e.data);
       let action = JSON.parse(e.data);
 
-      if (action.type === 'update') {
+      console.log(action.type);
+
+      if (action.type === 'create room') {
+	document.getElementById('board').textContent = '';
+	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	let buttons = document.getElementsByClassName('square');
+	for (let i = 0; i < buttons.length; i++) {
+	  buttons[i].addEventListener('click', () => {
+	    ws.send(JSON.stringify({
+	      type: 'move',
+	      square: buttons[i].id,
+	      roomNumber: roomNumber,
+	    }));
+	  });
+	}
+
+	document.getElementById('status').textContent = '';
+	let status = document.createTextNode('Waiting for opponent');
+	document.getElementById('status').appendChild((status));
+
+	document.getElementById('room').textContent = '';
+	let roomText = document.createTextNode(`ROOM ${action.room.number}`);
+	document.getElementById('room').appendChild((roomText));
+
+	mark = 'X';
+	document.getElementById('mark').textContent = '';
+	let markText = document.createTextNode(`Your mark is ${mark}`);
+	document.getElementById('mark').appendChild((markText));
+
+      } else if (action.type === 'second user access') {
+	document.getElementById('board').textContent = '';
+	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	let buttons = document.getElementsByClassName('square');
+	for (let i = 0; i < buttons.length; i++) {
+	  buttons[i].addEventListener('click', () => {
+	    ws.send(JSON.stringify({
+	      type: 'move',
+	      square: buttons[i].id,
+	      roomNumber: roomNumber,
+	    }));
+	  });
+	}
+
+	document.getElementById('status').textContent = '';
+	let status = document.createTextNode(`${action.room.next}'s turn`);
+	document.getElementById('status').appendChild((status));
+
+      } else if (action.type === 'join existing room') {
+	document.getElementById('board').textContent = '';
+	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	let buttons = document.getElementsByClassName('square');
+	for (let i = 0; i < buttons.length; i++) {
+	  buttons[i].addEventListener('click', () => {
+	    ws.send(JSON.stringify({
+	      type: 'move',
+	      square: buttons[i].id,
+	      roomNumber: roomNumber,
+	    }));
+	  });
+	}
+
+	document.getElementById('status').textContent = '';
+	let status = document.createTextNode(`${action.room.next}'s turn`);
+	document.getElementById('status').appendChild((status));
+
+	document.getElementById('room').textContent = '';
+	let roomText = document.createTextNode(`ROOM ${action.room.number}`);
+	document.getElementById('room').appendChild((roomText));	
+	
+	mark = action.room.users[0].mark === 'X' ? 'O' : 'X';
+	document.getElementById('mark').textContent = '';
+	let markText = document.createTextNode(`Your mark is ${mark}`);
+	document.getElementById('mark').appendChild((markText));
+
+      } else if (action.type === 'update') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.board));
 	let buttons = document.getElementsByClassName('square');
@@ -52,16 +127,6 @@
 	let status = document.createTextNode(`${'TODO'}`);
 	document.getElementById('status').appendChild((status));
 
-	if (action.room) {
-	  document.getElementById('room').textContent = '';
-	  let roomText = document.createTextNode(`ROOM ${action.room}`);
-	  document.getElementById('room').appendChild((roomText));
-	}
-	if (action.mark) {
-	  document.getElementById('mark').textContent = '';
-	  let markText = document.createTextNode(`Your mark is ${action.mark}`);
-	  document.getElementById('mark').appendChild((markText));
-	}
 	if (action.winner) {
 	  action.winner.positions.forEach((p) => {
 	    document.getElementById(p).style.color = 'red';
@@ -101,7 +166,7 @@
 	let status = document.createTextNode('new game!');
 	document.getElementById('status').appendChild((status));
       } else if (action.type === 'room number error') {
-	document.querySelector('.modal-bg').style.display = '';
+	document.querySelector('.modal-bg').style.display = '';//display modal window again
 	document.getElementById('error-message').textContent = 'Please, insert a number';
       } else if (action.type === 'room full') {
 	document.querySelector('.modal-bg').style.display = '';
