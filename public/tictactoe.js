@@ -78,7 +78,9 @@
 	}
 
 	document.getElementById('status').textContent = '';
-	let status = document.createTextNode(`${action.room.next}'s turn`);
+	let status = mark === action.room.next ?
+	    document.createTextNode(`Your turn`) :
+	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
       } else if (action.type === 'join existing room') {
@@ -96,7 +98,9 @@
 	}
 
 	document.getElementById('status').textContent = '';
-	let status = document.createTextNode(`${action.room.next}'s turn`);
+	let status = mark === action.room.next ?
+	    document.createTextNode(`Your turn`) :
+	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
 	document.getElementById('room').textContent = '';
@@ -110,7 +114,7 @@
 
       } else if (action.type === 'update') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board));
 	let buttons = document.getElementsByClassName('square');
 	for (let i = 0; i < buttons.length; i++) {
 	  buttons[i].addEventListener('click', () => {
@@ -123,11 +127,12 @@
 	}
 
 	document.getElementById('status').textContent = '';
-	//let status = document.createTextNode(`${action.status}`);
-	let status = document.createTextNode(`${'TODO'}`);
+	let status = mark === action.room.next ?
+	    document.createTextNode(`Your turn`) :
+	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
-	if (action.winner) {
+	if (action.room.winner) {
 	  action.winner.positions.forEach((p) => {
 	    document.getElementById(p).style.color = 'red';
 	  });
@@ -180,6 +185,7 @@
   }
 
   function renderBoard(moves) {
+    console.log(moves);
     let board = document.createElement('table');
     for (let rows = 0; rows < 3; rows++) {
       let row = document.createElement('tr');

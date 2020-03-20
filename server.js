@@ -89,15 +89,13 @@ wss.on('connection', (ws) => {
 	if (room.users.length === 2) {
 	  if (room.next === user.mark) {
 	    if (room.board[action.square] === null) {
-	      room.board[action.square] = user.mark;
-	      room.next = room.next === 'X' ? 'O' : 'X';
-	      rooms = r;
+	      room.board[action.square] = user.mark; //TODO: change board using method object?
+	      room.update({next: room.next === 'X' ? 'O' : 'X', winner: winner(room.board)});
+	      rooms = r; 
 	      room.users.forEach(u => {
 		u.ws.send(JSON.stringify({
 		  type: 'update',
-		  board: room.board,
-		  //status: winner(room.board) ? `${winner(room.board).mark} won` : `${room.next}'s turn`,
-		  winner: winner(room.board)
+		  room: room.hideWs()
 		}));
 	      });
 	    }
@@ -237,6 +235,7 @@ class Room {
     this.users = users;
     this.board = board;
     this.next = next;
+    this.winner = null;
   }
   update(config) {
     return Object.assign(this, config);
