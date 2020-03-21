@@ -89,8 +89,11 @@ wss.on('connection', (ws) => {
 	if (room.users.length === 2) {
 	  if (room.next === user.mark) {
 	    if (room.board[action.square] === null) {
+	      console.log(room.board);
 	      room.board[action.square] = user.mark; //TODO: change board using method object?
+	      console.log(room.board);
 	      room.update({next: room.next === 'X' ? 'O' : 'X', winner: winner(room.board)});
+	      console.log(room.hideWs());
 	      rooms = r; 
 	      room.users.forEach(u => {
 		u.ws.send(JSON.stringify({
@@ -169,7 +172,8 @@ function connect(ws, roomNumber) {
     room = new Room( roomNumber,
 		     [{ws: ws, mark: 'X'}],
 		     new Array(9).fill(null),
-		     'X' );
+		     'X',
+		     null );
     r.push(room);
     rooms = r;
     ws.send(JSON.stringify({
@@ -182,10 +186,9 @@ function connect(ws, roomNumber) {
       rooms = r;
       room.users[0].ws.send(JSON.stringify({ //an opponent is joining the client's room
 	type: 'second user access',
-	room: room
+	room: room.hideWs()
       }));
 
-      room = new Room(room.number, room.users, room.board, room.next);
       room.users[1].ws.send(JSON.stringify( //client is joining an opponent's room
 	{
 	  type: 'join existing room',
@@ -230,29 +233,32 @@ function winner(board) {
 }
 
 class Room {
-  constructor(number, users, board, next) {
+  constructor(number, users, board, next, winner) {
     this.number = number;
     this.users = users;
     this.board = board;
     this.next = next;
-    this.winner = null;
+    this.winner = winner;
   }
   update(config) {
     return Object.assign(this, config);
   }
   hideWs () { // create copy of room without ws data
-    return new Room(this.number,
-		    this.users
-		    ?
-		    this.users.length === 1
-		    ?
-		    [ {ws: 'hidden', mark: this.users[0].mark}]
-		    :
-		    [
-		      {ws: 'hidden', mark: this.users[0].mark},
-		      {ws: 'hidden', mark: this.users[1].mark}
-		    ]
-		    : this.users,
-		    this.board, this.next);
+    return new Room( this.number,
+		     this.users
+		     ?
+		     this.users.length === 1
+		     ?
+		     [ {ws: 'hidden', mark: this.users[0].mark}]
+		     :
+		     [
+		       {ws: 'hidden', mark: this.users[0].mark},
+		       {ws: 'hidden', mark: this.users[1].mark}
+		     ]
+		     : this.users,
+		     this.board,
+		     this.next,
+		     this.winner
+		   );
   }
 }

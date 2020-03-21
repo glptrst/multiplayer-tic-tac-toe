@@ -113,6 +113,9 @@
 	document.getElementById('mark').appendChild((markText));
 
       } else if (action.type === 'update') {
+
+	console.log(action.room);
+
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
 	let buttons = document.getElementsByClassName('square');
@@ -133,7 +136,8 @@
 	document.getElementById('status').appendChild((status));
 
 	if (action.room.winner) {
-	  action.winner.positions.forEach((p) => {
+	  console.log('winner');
+	  action.room.winner.positions.forEach((p) => {
 	    document.getElementById(p).style.color = 'red';
 	  });
 
