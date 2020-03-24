@@ -142,8 +142,10 @@
 	  });
 
 	  document.getElementById('status').textContent = '';
-	  //let status = document.createTextNode(`${action.status}.`);
-	  let status = document.createTextNode(`${"there's a winner..."}`);
+	  let status = action.room.winner.mark === mark ?
+	      document.createTextNode(`${"You won!"}`) :
+	      document.createTextNode(`${"You lost!"}`);
+
 	  let link = document.createElement('span');
 	  let linkTxt = document.createTextNode('Click here to start a new game');
 	  link.appendChild(linkTxt);
