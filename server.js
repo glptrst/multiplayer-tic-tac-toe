@@ -109,14 +109,12 @@ wss.on('connection', (ws) => {
       let r = rooms.slice();
       let room = roomExists(r, action.roomNumber);
 
-      room.board = new Array(9).fill(null);
-      //room.status = `${room.next}'s turn`;
+      room.board = new Array(9).fill(null); // TODO: use method?
 
       room.users.forEach((u) => {
 	u.ws.send(JSON.stringify({
 	  type: 'resetBoard',
-	  board: room.board,
-	  //status: room.status
+	  room: room.hideWs()
 	}));
       });
 

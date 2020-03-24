@@ -160,7 +160,7 @@
 	}
       } else if (action.type === 'resetBoard') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board));
 	let buttons = document.getElementsByClassName('square');
 	for (let i = 0; i < buttons.length; i++) {
 	  buttons[i].addEventListener('click', () => {
@@ -173,8 +173,9 @@
 	}
 
 	document.getElementById('status').textContent = '';
-	//let status = document.createTextNode(`New Game started! ${action.status}`);
-	let status = document.createTextNode('new game!');
+	let status = action.room.next === mark ?
+	    document.createTextNode("New game! It's your turn!"):
+	    document.createTextNode("New game! It's your opponent's turn");
 	document.getElementById('status').appendChild((status));
       } else if (action.type === 'room number error') {
 	document.querySelector('.modal-bg').style.display = '';//display modal window again
