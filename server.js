@@ -139,16 +139,11 @@ wss.on('connection', (ws) => {
 	else if (r[i].users[1].ws === ws)
 	  r[i].users.pop();
 
-	r[i].board = new Array(9).fill(null);
-	//r[i].status = 'Opponent left. Waiting for opponent.';
-	//TODO: communicate to client that opponent left without using the status
-	r[i].opponentLeft = true;
+	r[i].board = new Array(9).fill(null); // TODO: use method?
 	rooms = r;
 	r[i].users[0].ws.send(JSON.stringify({
-	  type: 'update',
-	  board: r[i].board,
-	  //status: r[i].status
-	  opponentLeft: r[i].opponentLeft
+	  type: 'userLeft',
+	  room: r[i]
 	}));
       }
     }

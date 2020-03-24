@@ -183,6 +183,23 @@
       } else if (action.type === 'room full') {
 	document.querySelector('.modal-bg').style.display = '';
 	document.getElementById('error-message').textContent = 'Room full, try another number.';
+      } else if (action.type === 'userLeft') {
+	document.getElementById('board').textContent = '';
+	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	let buttons = document.getElementsByClassName('square');
+	for (let i = 0; i < buttons.length; i++) {
+	  buttons[i].addEventListener('click', () => {
+	    ws.send(JSON.stringify({
+	      type: 'move',
+	      square: buttons[i].id,
+	      roomNumber: roomNumber,
+	    }));
+	  });
+	}
+
+	document.getElementById('status').textContent = '';
+	let status = document.createTextNode('Opponent left. Waiting for opponent.');
+	document.getElementById('status').appendChild((status));
       }
     };
 
