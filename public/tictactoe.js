@@ -138,7 +138,8 @@
 	if (action.room.winner) {
 	  console.log('winner');
 	  action.room.winner.positions.forEach((p) => {
-	    document.getElementById(p).style.color = 'red';
+	    document.getElementById(p).style.color =
+	      action.room.winner.mark === mark ? 'green' : 'red';
 	  });
 
 	  document.getElementById('status').textContent = '';
