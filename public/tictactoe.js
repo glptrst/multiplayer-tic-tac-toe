@@ -91,7 +91,7 @@
 	  buttons[i].addEventListener('click', () => {
 	    ws.send(JSON.stringify({
 	      type: 'move',
-	      square: buttons[i].id,
+	      square: buttons[i].id, // TODO: call it cell?
 	      roomNumber: roomNumber,
 	    }));
 	  });

@@ -90,7 +90,7 @@ wss.on('connection', (ws) => {
 	  if (room.next === user.mark) {
 	    if (room.board[action.square] === null) {
 	      console.log(room.board);
-	      room.board[action.square] = user.mark; //TODO: change board using method object?
+	      room.updateBoard(action.square, user.mark);
 	      console.log(room.board);
 	      room.update({next: room.next === 'X' ? 'O' : 'X', winner: winner(room.board)});
 	      console.log(room.hideWs());
@@ -109,7 +109,7 @@ wss.on('connection', (ws) => {
       let r = rooms.slice();
       let room = roomExists(r, action.roomNumber);
 
-      room.board = new Array(9).fill(null); // TODO: use method?
+      room.update({board: new Array(9).fill(null)});
 
       room.users.forEach((u) => {
 	u.ws.send(JSON.stringify({
@@ -139,7 +139,7 @@ wss.on('connection', (ws) => {
 	else if (r[i].users[1].ws === ws)
 	  r[i].users.pop();
 
-	r[i].board = new Array(9).fill(null); // TODO: use method?
+	r[i].update({board: new Array(9).fill(null)});
 	rooms = r;
 	r[i].users[0].ws.send(JSON.stringify({
 	  type: 'userLeft',
@@ -235,6 +235,11 @@ class Room {
   }
   update(config) {
     return Object.assign(this, config);
+  }
+  updateBoard(cell, value) {
+    let board = this.board.slice();
+    board[cell] = value;
+    return this.update({board: board});
   }
   hideWs () { // create copy of room without ws data
     return new Room( this.number,
