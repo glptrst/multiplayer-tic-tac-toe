@@ -74,14 +74,12 @@ wss.on('connection', (ws) => {
   ws.on('message', (action) => {
 
     action = JSON.parse(action);
-
-    console.log(action.type);
+    //console.log(action.type);
 
     if (action.type === 'connection') {
       connect(ws, action.roomNumber);
     } else if (action.type === 'move')  {
-      let r = rooms.slice();
-      let room = roomExists(r, action.roomNumber);
+      let room = roomExists(rooms, action.roomNumber);
       let user = room.users.filter(u => u.ws === ws)[0];
 
       // change rooms array
@@ -89,12 +87,8 @@ wss.on('connection', (ws) => {
 	if (room.users.length === 2) {
 	  if (room.next === user.mark) {
 	    if (room.board[action.square] === null) {
-	      console.log(room.board);
 	      room.updateBoard(action.square, user.mark);
-	      console.log(room.board);
 	      room.update({next: room.next === 'X' ? 'O' : 'X', winner: winner(room.board)});
-	      console.log(room.hideWs());
-	      rooms = r; 
 	      room.users.forEach(u => {
 		u.ws.send(JSON.stringify({
 		  type: 'update',
@@ -106,8 +100,7 @@ wss.on('connection', (ws) => {
 	}
       }
     } else if (action.type === 'newGame') {
-      let r = rooms.slice();
-      let room = roomExists(r, action.roomNumber);
+      let room = roomExists(rooms, action.roomNumber);
 
       room.update({board: new Array(9).fill(null)});
 
@@ -118,32 +111,27 @@ wss.on('connection', (ws) => {
 	}));
       });
 
-      rooms = r;
-
     } else {
       console.log('? 1');
     }
   });
 
   ws.on('close', (e) => {
-    let r = rooms.slice();
-    for (let i = 0; i < r.length; i++) {
-      if (r[i].users.length === 1) {
-	if (r[i].users[0].ws === ws) {
-	  r.splice(i, 1);
-	  rooms = r;
+    for (let i = 0; i < rooms.length; i++) {
+      if (rooms[i].users.length === 1) {
+	if (rooms[i].users[0].ws === ws) {
+	  rooms.splice(i, 1);
 	}
-      } else if (r[i].users.length === 2) {
-	if (r[i].users[0].ws === ws)
-	  r[i].users.shift();
-	else if (r[i].users[1].ws === ws)
-	  r[i].users.pop();
+      } else if (rooms[i].users.length === 2) {
+	if (rooms[i].users[0].ws === ws)
+	  rooms[i].users.shift();
+	else if (rooms[i].users[1].ws === ws)
+	  rooms[i].users.pop();
 
-	r[i].update({board: new Array(9).fill(null)});
-	rooms = r;
-	r[i].users[0].ws.send(JSON.stringify({
+	rooms[i].update({board: new Array(9).fill(null)});
+	rooms[i].users[0].ws.send(JSON.stringify({
 	  type: 'userLeft',
-	  room: r[i]
+	  room: rooms[i]
 	}));
       }
     }
@@ -158,8 +146,7 @@ function connect(ws, roomNumber) {
     return;
   }
 
-  let r = rooms.slice();
-  let room = roomExists(r, roomNumber);
+  let room = roomExists(rooms, roomNumber);
 
   if (!room) {
     room = new Room( roomNumber,
@@ -167,8 +154,7 @@ function connect(ws, roomNumber) {
 		     new Array(9).fill(null),
 		     'X',
 		     null );
-    r.push(room);
-    rooms = r;
+    rooms.push(room);
     ws.send(JSON.stringify({
       type: 'create room',
       room: room.hideWs()
@@ -176,7 +162,6 @@ function connect(ws, roomNumber) {
   } else {
     if (room.users.length === 1) {
       room.update({users: [room.users[0], {ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'}]});
-      rooms = r;
       room.users[0].ws.send(JSON.stringify({ //an opponent is joining the client's room
 	type: 'second user access',
 	room: room.hideWs()
