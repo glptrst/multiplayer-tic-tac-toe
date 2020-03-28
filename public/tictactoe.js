@@ -39,16 +39,6 @@
       if (action.type === 'create room') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
-	let buttons = document.getElementsByClassName('square');
-	for (let i = 0; i < buttons.length; i++) {
-	  buttons[i].addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: buttons[i].id,
-	      roomNumber: roomNumber,
-	    }));
-	  });
-	}
 
 	document.getElementById('status').textContent = '';
 	let status = document.createTextNode('Waiting for opponent');
@@ -66,16 +56,6 @@
       } else if (action.type === 'second user access') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
-	let buttons = document.getElementsByClassName('square');
-	for (let i = 0; i < buttons.length; i++) {
-	  buttons[i].addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: buttons[i].id,
-	      roomNumber: roomNumber,
-	    }));
-	  });
-	}
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -86,16 +66,6 @@
       } else if (action.type === 'join existing room') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
-	let buttons = document.getElementsByClassName('square');
-	for (let i = 0; i < buttons.length; i++) {
-	  buttons[i].addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: buttons[i].id, // TODO: call it cell?
-	      roomNumber: roomNumber,
-	    }));
-	  });
-	}
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -118,16 +88,6 @@
 
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
-	let buttons = document.getElementsByClassName('square');
-	for (let i = 0; i < buttons.length; i++) {
-	  buttons[i].addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: buttons[i].id,
-	      roomNumber: roomNumber,
-	    }));
-	  });
-	}
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -162,16 +122,6 @@
       } else if (action.type === 'resetBoard') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
-	let buttons = document.getElementsByClassName('square');
-	for (let i = 0; i < buttons.length; i++) {
-	  buttons[i].addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: buttons[i].id,
-	      roomNumber: roomNumber,
-	    }));
-	  });
-	}
 
 	document.getElementById('status').textContent = '';
 	let status = action.room.next === mark ?
@@ -187,16 +137,6 @@
       } else if (action.type === 'userLeft') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
-	let buttons = document.getElementsByClassName('square');
-	for (let i = 0; i < buttons.length; i++) {
-	  buttons[i].addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: buttons[i].id,
-	      roomNumber: roomNumber,
-	    }));
-	  });
-	}
 
 	document.getElementById('status').textContent = '';
 	let status = document.createTextNode('Opponent left. Waiting for opponent.');
@@ -207,25 +147,32 @@
     let moves = [null, null, null,
 		 null, null, null,
 		 null, null, null];
-  }
 
-  function renderBoard(moves) {
-    console.log(moves);
-    let board = document.createElement('table');
-    for (let rows = 0; rows < 3; rows++) {
-      let row = document.createElement('tr');
-      row.className= 'row';
-      for (let cells = 0; cells < 3; cells++) {
-	let cell = document.createElement('td');
-	cell.className = 'square';
-	cell.id = cells+rows*3;
-	let cellContent = document.createTextNode(moves[cells+rows*3] ? moves[cells+rows*3] : '');
-	cell.appendChild(cellContent);
-	row.appendChild(cell);
+    function renderBoard(moves) {
+      console.log(moves);
+      let board = document.createElement('table');
+      for (let rows = 0; rows < 3; rows++) {
+	let row = document.createElement('tr');
+	row.className= 'row';
+	for (let cells = 0; cells < 3; cells++) {
+	  let cell = document.createElement('td');
+	  cell.className = 'square';
+	  cell.id = cells+rows*3;
+	  let cellContent = document.createTextNode(moves[cells+rows*3] ? moves[cells+rows*3] : '');
+	  cell.appendChild(cellContent);
+	  cell.addEventListener('click', () => {
+	    ws.send(JSON.stringify({
+	      type: 'move',
+	      square: cell.id,
+	      roomNumber: roomNumber,
+	    }));
+	  });
+	  row.appendChild(cell);
+	}
+	board.appendChild(row);
       }
-      board.appendChild(row);
+      return board;
     }
-    return board;
   }
 
 })();
