@@ -10,12 +10,12 @@
     roomNumber = document.getElementsByTagName('input')[0].value;
     startApp(roomNumber);
   });
-
-  // click #roomButton when pressing the Return Key
   document.getElementsByClassName("modal-bg")[0].addEventListener("keyup", (event) => {
     event.preventDefault();
     if (event.keyCode === 13) {
-      document.getElementById("roomButton").click();
+      document.querySelector('.modal-bg').style.display = 'none';
+      roomNumber = document.getElementsByTagName('input')[0].value;
+      startApp(roomNumber);
     }
   });
 
