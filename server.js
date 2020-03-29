@@ -88,7 +88,8 @@ wss.on('connection', (ws) => {
 	  if (room.next === user.mark) {
 	    if (room.board[action.square] === null) {
 	      room.updateBoard(action.square, user.mark);
-	      room.update({next: room.next === 'X' ? 'O' : 'X', winner: winner(room.board)});
+	      room.update({next: room.next === 'X' ? 'O' : 'X',
+			   winner: winner(room.board)});
 	      room.users.forEach(u => {
 		u.ws.send(JSON.stringify({
 		  type: 'update',
@@ -245,3 +246,25 @@ class Room {
 		   );
   }
 }
+
+// TODO: handle winner in the client side?
+function winner(board) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return {mark: board[a], positions: lines[i]};
+    }
+  }
+  return null;
+}
+

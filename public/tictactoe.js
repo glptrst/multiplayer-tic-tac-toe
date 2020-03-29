@@ -119,6 +119,24 @@
 	  document.getElementById('status').appendChild((status));
 	  document.getElementById('status').appendChild((link));
 	}
+
+	// TODO: handle draw
+	if (draw(action.room.board)) {
+	  console.log('draw');
+	  document.getElementById('status').textContent = '';
+	  let status = document.createTextNode("It's a draw!");
+	  let link = document.createElement('span');
+	  let linkTxt = document.createTextNode('Click here to start a new game');
+	  link.appendChild(linkTxt);
+	  link.addEventListener('click', () => {
+	    ws.send(JSON.stringify({
+	      type: 'newGame',
+	      roomNumber: roomNumber,
+	    }));
+	  });
+	  document.getElementById('status').appendChild((status));
+	  document.getElementById('status').appendChild((link));
+	}
       } else if (action.type === 'resetBoard') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
@@ -172,6 +190,20 @@
 	board.appendChild(row);
       }
       return board;
+    }
+
+    function draw(board) {
+      let emptyCells = board.filter((c) => {
+	if (!c)
+	  return true;
+	else
+	  return false;
+      });
+
+      if (emptyCells.length === 0)
+	return true;
+      else
+	return false;
     }
   }
 
