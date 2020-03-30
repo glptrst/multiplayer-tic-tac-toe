@@ -83,20 +83,19 @@ wss.on('connection', (ws) => {
       let user = room.users.filter(u => u.ws === ws)[0];
 
       // change rooms array
-      if (!winner(room.board)) {
-	if (room.users.length === 2) {
-	  if (room.next === user.mark) {
-	    if (room.board[action.square] === null) {
-	      room.updateBoard(action.square, user.mark);
-	      room.update({next: room.next === 'X' ? 'O' : 'X',
-			   winner: winner(room.board)});
-	      room.users.forEach(u => {
-		u.ws.send(JSON.stringify({
-		  type: 'update',
-		  room: room.hideWs()
-		}));
-	      });
-	    }
+      if (room.users.length === 2) {
+	if (room.next === user.mark) {
+	  if (room.board[action.square] === null) {
+	    room.updateBoard(action.square, user.mark);
+	    room.update({next: room.next === 'X' ? 'O' : 'X',
+			 //winner: winner(room.board)
+			});
+	    room.users.forEach(u => {
+	      u.ws.send(JSON.stringify({
+		type: 'update',
+		room: room.hideWs()
+	      }));
+	    });
 	  }
 	}
       }
@@ -191,33 +190,12 @@ function roomExists(rooms, number) {
   })[0];
 };
 
-function winner(board) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return {mark: board[a], positions: lines[i]};
-    }
-  }
-  return null;
-}
-
 class Room {
-  constructor(number, users, board, next, winner) {
+  constructor(number, users, board, next) {
     this.number = number;
     this.users = users;
     this.board = board;
     this.next = next;
-    this.winner = winner;
   }
   update(config) {
     return Object.assign(this, config);
@@ -242,29 +220,6 @@ class Room {
 		     : this.users,
 		     this.board,
 		     this.next,
-		     this.winner
 		   );
   }
 }
-
-// TODO: handle winner in the client side?
-function winner(board) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return {mark: board[a], positions: lines[i]};
-    }
-  }
-  return null;
-}
-

@@ -95,15 +95,15 @@
 	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
-	if (action.room.winner) {
+	if (winner(action.room.board)) {
 	  console.log('winner');
-	  action.room.winner.positions.forEach((p) => {
+	  winner(action.room.board).positions.forEach((p) => {
 	    document.getElementById(p).style.color =
-	      action.room.winner.mark === mark ? 'green' : 'red';
+	      winner(action.room.board).mark === mark ? 'green' : 'red';
 	  });
 
 	  document.getElementById('status').textContent = '';
-	  let status = action.room.winner.mark === mark ?
+	  let status = winner(action.room.board).mark === mark ?
 	      document.createTextNode(`${"You won!"}`) :
 	      document.createTextNode(`${"You lost!"}`);
 
@@ -120,7 +120,6 @@
 	  document.getElementById('status').appendChild((link));
 	}
 
-	// TODO: handle draw
 	if (draw(action.room.board)) {
 	  console.log('draw');
 	  document.getElementById('status').textContent = '';
@@ -162,10 +161,6 @@
       }
     };
 
-    let moves = [null, null, null,
-		 null, null, null,
-		 null, null, null];
-
     function renderBoard(moves) {
       console.log(moves);
       let board = document.createElement('table');
@@ -190,6 +185,26 @@
 	board.appendChild(row);
       }
       return board;
+    }
+
+    function winner(board) {
+      const lines = [
+	[0, 1, 2],
+	[3, 4, 5],
+	[6, 7, 8],
+	[0, 3, 6],
+	[1, 4, 7],
+	[2, 5, 8],
+	[0, 4, 8],
+	[2, 4, 6],
+      ];
+      for (let i = 0; i < lines.length; i++) {
+	const [a, b, c] = lines[i];
+	if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+	  return {mark: board[a], positions: lines[i]};
+	}
+      }
+      return null;
     }
 
     function draw(board) {
