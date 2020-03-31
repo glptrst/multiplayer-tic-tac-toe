@@ -4,6 +4,7 @@
 
   let mark;
   let roomNumber;
+  let winner = null;
 
   document.getElementById('roomButton').addEventListener('click', () => {
     document.querySelector('.modal-bg').style.display = 'none';
@@ -95,15 +96,15 @@
 	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
-	if (winner(action.room.board)) {
+	if (winner = getWinner(action.room.board)) {
 	  console.log('winner');
-	  winner(action.room.board).positions.forEach((p) => {
+	  getWinner(action.room.board).positions.forEach((p) => {
 	    document.getElementById(p).style.color =
-	      winner(action.room.board).mark === mark ? 'green' : 'red';
+	      getWinner(action.room.board).mark === mark ? 'green' : 'red';
 	  });
 
 	  document.getElementById('status').textContent = '';
-	  let status = winner(action.room.board).mark === mark ?
+	  let status = getWinner(action.room.board).mark === mark ?
 	      document.createTextNode(`${"You won!"}`) :
 	      document.createTextNode(`${"You lost!"}`);
 
@@ -111,6 +112,7 @@
 	  let linkTxt = document.createTextNode('Click here to start a new game');
 	  link.appendChild(linkTxt);
 	  link.addEventListener('click', () => {
+	    winner = null;
 	    ws.send(JSON.stringify({
 	      type: 'newGame',
 	      roomNumber: roomNumber,
@@ -174,11 +176,13 @@
 	  let cellContent = document.createTextNode(moves[cells+rows*3] ? moves[cells+rows*3] : '');
 	  cell.appendChild(cellContent);
 	  cell.addEventListener('click', () => {
-	    ws.send(JSON.stringify({
-	      type: 'move',
-	      square: cell.id,
-	      roomNumber: roomNumber,
-	    }));
+	    if (!winner) {
+	      ws.send(JSON.stringify({
+		type: 'move',
+		square: cell.id,
+		roomNumber: roomNumber,
+	      }));
+	    }
 	  });
 	  row.appendChild(cell);
 	}
@@ -187,7 +191,7 @@
       return board;
     }
 
-    function winner(board) {
+    function getWinner(board) {
       const lines = [
 	[0, 1, 2],
 	[3, 4, 5],
