@@ -1,4 +1,5 @@
 'use strict';
+const functions = require('./modules/functions.js');
 const http = require('http');
 const fs = require('fs');
 
@@ -8,6 +9,7 @@ const WebSocket = require('ws');
 /* HTTP SERVER */
 /*             */
 const server = http.createServer((req, res) => {
+  console.log(req.url);
   if (req.url === '/') {
     fs.readFile('./public/index.html', (err, page) => {
       if (err) {
@@ -20,6 +22,18 @@ const server = http.createServer((req, res) => {
     });
   } else if (req.url === '/tictactoe.js') {
     fs.readFile('./public/tictactoe.js', (err, script) => {
+      if (err) {
+	res.writeHead(404);
+	res.end(JSON.stringify(err));
+	return;
+      }
+      res.writeHead(200, {
+	'Content-Type': 'text/javscript'
+      });
+      res.end(script);
+    });
+  } else if (req.url === '/modules/functions.js') {
+    fs.readFile('./modules/functions.js', (err, script) => {
       if (err) {
 	res.writeHead(404);
 	res.end(JSON.stringify(err));
@@ -81,23 +95,17 @@ wss.on('connection', (ws) => {
     } else if (action.type === 'move')  {
       let room = roomExists(rooms, action.roomNumber);
       let user = room.users.filter(u => u.ws === ws)[0];
-
-      // change rooms array
-      if (room.users.length === 2) {
-	if (room.next === user.mark) {
-	  if (room.board[action.square] === null) {
-	    room.updateBoard(action.square, user.mark);
-	    room.update({next: room.next === 'X' ? 'O' : 'X',
-			 //winner: winner(room.board)
-			});
-	    room.users.forEach(u => {
-	      u.ws.send(JSON.stringify({
-		type: 'update',
-		room: room.hideWs()
-	      }));
-	    });
-	  }
-	}
+      if (room && room.users.length === 2 && room.board[action.square] === null &&
+	  room.next === user.mark &&
+	  !functions.draw(room.board) && !functions.winner(room.board)) {
+	room.updateBoard(action.square, user.mark);
+      	room.update({next: room.next === 'X' ? 'O' : 'X'});
+      	room.users.forEach(u => {
+      	  u.ws.send(JSON.stringify({
+      	    type: 'update',
+      	    room: room.hideWs()
+      	  }));
+      	});
       }
     } else if (action.type === 'newGame') {
       let room = roomExists(rooms, action.roomNumber);

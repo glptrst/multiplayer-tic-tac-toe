@@ -4,7 +4,6 @@
 
   let mark;
   let roomNumber;
-  let winner = null;
 
   document.getElementById('roomButton').addEventListener('click', () => {
     document.querySelector('.modal-bg').style.display = 'none';
@@ -96,15 +95,15 @@
 	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
-	if (winner = getWinner(action.room.board)) {
+	if (functions.winner(action.room.board)) {
 	  console.log('winner');
-	  getWinner(action.room.board).positions.forEach((p) => {
+	  functions.winner(action.room.board).positions.forEach((p) => {
 	    document.getElementById(p).style.color =
-	      getWinner(action.room.board).mark === mark ? 'green' : 'red';
+	      functions.winner(action.room.board).mark === mark ? 'green' : 'red';
 	  });
 
 	  document.getElementById('status').textContent = '';
-	  let status = getWinner(action.room.board).mark === mark ?
+	  let status = functions.winner(action.room.board).mark === mark ?
 	      document.createTextNode(`${"You won!"}`) :
 	      document.createTextNode(`${"You lost!"}`);
 
@@ -112,7 +111,6 @@
 	  let linkTxt = document.createTextNode('Click here to start a new game');
 	  link.appendChild(linkTxt);
 	  link.addEventListener('click', () => {
-	    winner = null;
 	    ws.send(JSON.stringify({
 	      type: 'newGame',
 	      roomNumber: roomNumber,
@@ -122,7 +120,7 @@
 	  document.getElementById('status').appendChild((link));
 	}
 
-	if (draw(action.room.board)) {
+	if (functions.draw(action.room.board)) {
 	  console.log('draw');
 	  document.getElementById('status').textContent = '';
 	  let status = document.createTextNode("It's a draw!");
@@ -138,6 +136,8 @@
 	  document.getElementById('status').appendChild((status));
 	  document.getElementById('status').appendChild((link));
 	}
+
+
       } else if (action.type === 'resetBoard') {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board));
@@ -176,13 +176,11 @@
 	  let cellContent = document.createTextNode(moves[cells+rows*3] ? moves[cells+rows*3] : '');
 	  cell.appendChild(cellContent);
 	  cell.addEventListener('click', () => {
-	    if (!winner) {
 	      ws.send(JSON.stringify({
 		type: 'move',
 		square: cell.id,
 		roomNumber: roomNumber,
 	      }));
-	    }
 	  });
 	  row.appendChild(cell);
 	}
@@ -190,40 +188,5 @@
       }
       return board;
     }
-
-    function getWinner(board) {
-      const lines = [
-	[0, 1, 2],
-	[3, 4, 5],
-	[6, 7, 8],
-	[0, 3, 6],
-	[1, 4, 7],
-	[2, 5, 8],
-	[0, 4, 8],
-	[2, 4, 6],
-      ];
-      for (let i = 0; i < lines.length; i++) {
-	const [a, b, c] = lines[i];
-	if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-	  return {mark: board[a], positions: lines[i]};
-	}
-      }
-      return null;
-    }
-
-    function draw(board) {
-      let emptyCells = board.filter((c) => {
-	if (!c)
-	  return true;
-	else
-	  return false;
-      });
-
-      if (emptyCells.length === 0)
-	return true;
-      else
-	return false;
-    }
   }
-
 })();
