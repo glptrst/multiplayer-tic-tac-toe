@@ -38,7 +38,7 @@
 
       if (action.type === 'create room') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
 	document.getElementById('status').textContent = '';
 	let status = document.createTextNode('Waiting for opponent');
@@ -55,7 +55,7 @@
 
       } else if (action.type === 'second user access') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -65,7 +65,7 @@
 
       } else if (action.type === 'join existing room') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -87,7 +87,7 @@
 	console.log(action.room);
 
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -95,15 +95,15 @@
 	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
 
-	if (functions.winner(action.room.board)) {
+	if (functions.winner(action.room.board.cells)) {
 	  console.log('winner');
-	  functions.winner(action.room.board).positions.forEach((p) => {
+	  functions.winner(action.room.board.cells).positions.forEach((p) => {
 	    document.getElementById(p).style.color =
-	      functions.winner(action.room.board).mark === mark ? 'green' : 'red';
+	      functions.winner(action.room.board.cells).mark === mark ? 'green' : 'red';
 	  });
 
 	  document.getElementById('status').textContent = '';
-	  let status = functions.winner(action.room.board).mark === mark ?
+	  let status = functions.winner(action.room.board.cells).mark === mark ?
 	      document.createTextNode(`${"You won!"}`) :
 	      document.createTextNode(`${"You lost!"}`);
 
@@ -120,7 +120,7 @@
 	  document.getElementById('status').appendChild((link));
 	}
 
-	if (functions.draw(action.room.board)) {
+	if (functions.draw(action.room.board.cells)) {
 	  console.log('draw');
 	  document.getElementById('status').textContent = '';
 	  let status = document.createTextNode("It's a draw!");
@@ -140,7 +140,7 @@
 
       } else if (action.type === 'resetBoard') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
 	document.getElementById('status').textContent = '';
 	let status = action.room.next === mark ?
@@ -155,7 +155,7 @@
 	document.getElementById('error-message').textContent = 'Room full, try another number.';
       } else if (action.type === 'userLeft') {
 	document.getElementById('board').textContent = '';
-	document.getElementById('board').appendChild(renderBoard(action.room.board));
+	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
 	document.getElementById('status').textContent = '';
 	let status = document.createTextNode('Opponent left. Waiting for opponent.');

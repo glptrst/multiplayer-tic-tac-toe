@@ -95,11 +95,12 @@ wss.on('connection', (ws) => {
     } else if (action.type === 'move')  {
       let room = roomExists(rooms, action.roomNumber);
       let user = room.users.filter(u => u.ws === ws)[0];
-      if (room && room.users.length === 2 && room.board[action.square] === null &&
+      if (room && room.users.length === 2 && room.board.cells[action.square] === null &&
 	  room.next === user.mark &&
-	  !functions.draw(room.board) && !functions.winner(room.board)) {
-	room.updateBoard(action.square, user.mark);
-      	room.update({next: room.next === 'X' ? 'O' : 'X'});
+	  !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
+	//room.updateBoard(action.square, user.mark);
+      	room.update({next: room.next === 'X' ? 'O' : 'X',
+		     board: room.board.update(action.square, user.mark)});
       	room.users.forEach(u => {
       	  u.ws.send(JSON.stringify({
       	    type: 'update',
@@ -110,7 +111,7 @@ wss.on('connection', (ws) => {
     } else if (action.type === 'newGame') {
       let room = roomExists(rooms, action.roomNumber);
 
-      room.update({board: new Array(9).fill(null)});
+      room.update({board: Board.empty()});
 
       room.users.forEach((u) => {
 	u.ws.send(JSON.stringify({
@@ -136,7 +137,7 @@ wss.on('connection', (ws) => {
 	else if (rooms[i].users[1].ws === ws)
 	  rooms[i].users.pop();
 
-	rooms[i].update({board: new Array(9).fill(null)});
+	rooms[i].update({board: Board.empty});
 	rooms[i].users[0].ws.send(JSON.stringify({
 	  type: 'userLeft',
 	  room: rooms[i]
@@ -159,7 +160,7 @@ function connect(ws, roomNumber) {
   if (!room) {
     room = new Room( roomNumber,
 		     [{ws: ws, mark: 'X'}],
-		     new Array(9).fill(null),
+		     Board.empty(),
 		     'X',
 		     null );
     rooms.push(room);
@@ -208,11 +209,6 @@ class Room {
   update(config) {
     return Object.assign(this, config);
   }
-  updateBoard(cell, value) {
-    let board = this.board.slice();
-    board[cell] = value;
-    return this.update({board: board});
-  }
   hideWs () { // create copy of room without ws data
     return new Room( this.number,
 		     this.users
@@ -229,5 +225,19 @@ class Room {
 		     this.board,
 		     this.next,
 		   );
+  }
+}
+
+class Board {
+  constructor(cells) {
+    this.cells = cells;
+  }
+  static empty() {
+    return new Board(new Array(9).fill(null));
+  }
+  update(cell, value) {
+    let cells = this.cells.slice();
+    cells[cell] = value;
+    return new Board(cells);
   }
 }
