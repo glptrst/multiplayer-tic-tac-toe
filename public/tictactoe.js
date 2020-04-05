@@ -34,7 +34,7 @@
       //console.log(e.data);
       let action = JSON.parse(e.data);
 
-      console.log(action.type);
+      //console.log(action.type);
 
       if (action.type === 'create room') {
 	document.getElementById('board').textContent = '';
@@ -83,9 +83,6 @@
 	document.getElementById('mark').appendChild((markText));
 
       } else if (action.type === 'update') {
-
-	console.log(action.room);
-
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -96,7 +93,6 @@
 	document.getElementById('status').appendChild((status));
 
 	if (functions.winner(action.room.board.cells)) {
-	  console.log('winner');
 	  functions.winner(action.room.board.cells).positions.forEach((p) => {
 	    document.getElementById(p).style.color =
 	      functions.winner(action.room.board.cells).mark === mark ? 'green' : 'red';
@@ -121,7 +117,6 @@
 	}
 
 	if (functions.draw(action.room.board.cells)) {
-	  console.log('draw');
 	  document.getElementById('status').textContent = '';
 	  let status = document.createTextNode("It's a draw!");
 	  let link = document.createElement('span');
@@ -164,7 +159,6 @@
     };
 
     function renderBoard(moves) {
-      console.log(moves);
       let board = document.createElement('table');
       for (let rows = 0; rows < 3; rows++) {
 	let row = document.createElement('tr');

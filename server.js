@@ -9,7 +9,7 @@ const WebSocket = require('ws');
 /* HTTP SERVER */
 /*             */
 const server = http.createServer((req, res) => {
-  console.log(req.url);
+  //console.log(req.url);
   if (req.url === '/') {
     fs.readFile('./public/index.html', (err, page) => {
       if (err) {
@@ -95,12 +95,16 @@ wss.on('connection', (ws) => {
     } else if (action.type === 'move')  {
       let room = roomExists(rooms, action.roomNumber);
       let user = room.users.filter(u => u.ws === ws)[0];
+
       if (room && room.users.length === 2 && room.board.cells[action.square] === null &&
 	  room.next === user.mark &&
 	  !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
-	//room.updateBoard(action.square, user.mark);
-      	room.update({next: room.next === 'X' ? 'O' : 'X',
-		     board: room.board.update(action.square, user.mark)});
+
+      	let updatedRoom = room.update({next: room.next === 'X' ? 'O' : 'X',
+				       board: room.board.update(action.square, user.mark)});
+	rooms = rooms.filter((r) => r !== room);
+	room = updatedRoom;
+	rooms.push(room);
       	room.users.forEach(u => {
       	  u.ws.send(JSON.stringify({
       	    type: 'update',
@@ -110,8 +114,10 @@ wss.on('connection', (ws) => {
       }
     } else if (action.type === 'newGame') {
       let room = roomExists(rooms, action.roomNumber);
-
-      room.update({board: Board.empty()});
+      let updatedRoom = room.update({board: Board.empty()});
+      rooms = rooms.filter((r) => r !== room);
+      room = updatedRoom;
+      rooms.push(room);
 
       room.users.forEach((u) => {
 	u.ws.send(JSON.stringify({
@@ -133,14 +139,14 @@ wss.on('connection', (ws) => {
 	}
       } else if (rooms[i].users.length === 2) {
 	if (rooms[i].users[0].ws === ws)
-	  rooms[i].users.shift();
+	  rooms[i] = rooms[i].update({users: [rooms[i].users.slice().pop()]});
 	else if (rooms[i].users[1].ws === ws)
-	  rooms[i].users.pop();
+	  rooms[i] = rooms[i].update({users: [rooms[i].users.slice().shift()]});
 
-	rooms[i].update({board: Board.empty});
+	rooms[i] = rooms[i].update({board: Board.empty()});
 	rooms[i].users[0].ws.send(JSON.stringify({
 	  type: 'userLeft',
-	  room: rooms[i]
+	  room: rooms[i].hideWs()
 	}));
       }
     }
@@ -170,7 +176,11 @@ function connect(ws, roomNumber) {
     }));
   } else {
     if (room.users.length === 1) {
-      room.update({users: [room.users[0], {ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'}]});
+      let updatedRoom = room.update({users: [room.users[0], {ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'}]});
+
+      rooms = rooms.filter((r) => r !== room);
+      room = updatedRoom;
+      rooms.push(room);
       room.users[0].ws.send(JSON.stringify({ //an opponent is joining the client's room
 	type: 'second user access',
 	room: room.hideWs()
@@ -207,7 +217,7 @@ class Room {
     this.next = next;
   }
   update(config) {
-    return Object.assign(this, config);
+    return Object.assign(new Room(), this, config);
   }
   hideWs () { // create copy of room without ws data
     return new Room( this.number,
