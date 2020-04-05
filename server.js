@@ -85,72 +85,27 @@ let rooms = [
 ];
 
 wss.on('connection', (ws) => {
-  ws.on('message', (action) => {
 
-    action = JSON.parse(action);
-    //console.log(action.type);
-
-    if (action.type === 'connection') {
-      connect(ws, action.roomNumber);
-    } else if (action.type === 'move')  {
-      let room = roomExists(rooms, action.roomNumber);
-      let user = room.users.filter(u => u.ws === ws)[0];
-
-      if (room && room.users.length === 2 && room.board.cells[action.square] === null &&
-	  room.next === user.mark &&
-	  !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
-
-      	let updatedRoom = room.update({next: room.next === 'X' ? 'O' : 'X',
-				       board: room.board.update(action.square, user.mark)});
-	rooms = rooms.filter((r) => r !== room);
-	room = updatedRoom;
-	rooms.push(room);
-      	room.users.forEach(u => {
-      	  u.ws.send(JSON.stringify({
-      	    type: 'update',
-      	    room: room.hideWs()
-      	  }));
-      	});
-      }
-    } else if (action.type === 'newGame') {
-      let room = roomExists(rooms, action.roomNumber);
-      let updatedRoom = room.update({board: Board.empty()});
-      rooms = rooms.filter((r) => r !== room);
-      room = updatedRoom;
-      rooms.push(room);
-
-      room.users.forEach((u) => {
-	u.ws.send(JSON.stringify({
-	  type: 'resetBoard',
-	  room: room.hideWs()
-	}));
-      });
-
+  ws.on('message', (req) => {
+    req = JSON.parse(req);
+    //console.log(req.type);
+    if (req.type === 'connection') {
+      connect(ws, req.roomNumber);
+    } else if (req.type === 'move')  {
+      let room = roomExists(rooms, req.roomNumber);
+      makeMove(ws, room, req.cell);
+    } else if (req.type === 'newGame') {
+      let room = roomExists(rooms, req.roomNumber);
+      startNewGame(room);
     } else {
       console.log('? 1');
     }
   });
 
   ws.on('close', (e) => {
-    for (let i = 0; i < rooms.length; i++) {
-      if (rooms[i].users.length === 1) {
-	if (rooms[i].users[0].ws === ws) {
-	  rooms.splice(i, 1);
-	}
-      } else if (rooms[i].users.length === 2) {
-	if (rooms[i].users[0].ws === ws)
-	  rooms[i] = rooms[i].update({users: [rooms[i].users.slice().pop()]});
-	else if (rooms[i].users[1].ws === ws)
-	  rooms[i] = rooms[i].update({users: [rooms[i].users.slice().shift()]});
-
-	rooms[i] = rooms[i].update({board: Board.empty()});
-	rooms[i].users[0].ws.send(JSON.stringify({
-	  type: 'userLeft',
-	  room: rooms[i].hideWs()
-	}));
-      }
-    }
+    disconnectUser(ws);
   });
+
 });
 
 function connect(ws, roomNumber) {
@@ -195,6 +150,60 @@ function connect(ws, roomNumber) {
     } else {
       ws.send(JSON.stringify({
 	type: 'room full'
+      }));
+    }
+  }
+}
+
+function makeMove(ws, room, cell) {
+  let user = room.users.filter(u => u.ws === ws)[0];
+  if (room && room.users.length === 2 && room.board.cells[cell] === null &&
+      room.next === user.mark &&
+      !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
+    let updatedRoom = room.update({next: room.next === 'X' ? 'O' : 'X',
+				   board: room.board.update(cell, user.mark)});
+    rooms = rooms.filter((r) => r !== room);
+    room = updatedRoom;
+    rooms.push(room);
+    room.users.forEach(u => {
+      u.ws.send(JSON.stringify({
+      	type: 'update',
+      	room: room.hideWs()
+      }));
+    });
+  }
+}
+
+function startNewGame(room) {
+  let updatedRoom = room.update({board: Board.empty()});
+  rooms = rooms.filter((r) => r !== room);
+  room = updatedRoom;
+  rooms.push(room);
+
+  room.users.forEach((u) => {
+    u.ws.send(JSON.stringify({
+      type: 'resetBoard',
+      room: room.hideWs()
+    }));
+  });
+}
+
+function disconnectUser(ws) {
+  for (let i = 0; i < rooms.length; i++) {
+    if (rooms[i].users.length === 1) {
+      if (rooms[i].users[0].ws === ws) {
+	rooms.splice(i, 1);
+      }
+    } else if (rooms[i].users.length === 2) {
+      if (rooms[i].users[0].ws === ws)
+	rooms[i] = rooms[i].update({users: [rooms[i].users.slice().pop()]});
+      else if (rooms[i].users[1].ws === ws)
+	rooms[i] = rooms[i].update({users: [rooms[i].users.slice().shift()]});
+
+      rooms[i] = rooms[i].update({board: Board.empty()});
+      rooms[i].users[0].ws.send(JSON.stringify({
+	type: 'userLeft',
+	room: rooms[i].hideWs()
       }));
     }
   }

@@ -64,8 +64,12 @@
 	document.getElementById('status').appendChild((status));
 
       } else if (action.type === 'join existing room') {
+	mark = action.room.users[0].mark === 'X' ? 'O' : 'X';
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
+
+	console.log(`mark: ${mark}`);
+	console.log(`next: ${action.room.next}`);
 
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
@@ -172,7 +176,7 @@
 	  cell.addEventListener('click', () => {
 	      ws.send(JSON.stringify({
 		type: 'move',
-		square: cell.id,
+		cell: cell.id,
 		roomNumber: roomNumber,
 	      }));
 	  });
