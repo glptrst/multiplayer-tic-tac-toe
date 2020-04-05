@@ -133,7 +133,7 @@ function connect(ws, roomNumber) {
     if (room.users.length === 1) {
       let updatedRoom = room.update({users: [room.users[0], {ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'}]});
 
-      rooms = rooms.filter((r) => r !== room);
+      rooms = rooms.filter((r) => r.number !== room.number);
       room = updatedRoom;
       rooms.push(room);
       room.users[0].ws.send(JSON.stringify({ //an opponent is joining the client's room
@@ -162,7 +162,7 @@ function makeMove(ws, room, cell) {
       !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
     let updatedRoom = room.update({next: room.next === 'X' ? 'O' : 'X',
 				   board: room.board.update(cell, user.mark)});
-    rooms = rooms.filter((r) => r !== room);
+    rooms = rooms.filter((r) => r.number !== room.number);
     room = updatedRoom;
     rooms.push(room);
     room.users.forEach(u => {
@@ -176,7 +176,7 @@ function makeMove(ws, room, cell) {
 
 function startNewGame(room) {
   let updatedRoom = room.update({board: Board.empty()});
-  rooms = rooms.filter((r) => r !== room);
+  rooms = rooms.filter((r) => r.number !== room.number);
   room = updatedRoom;
   rooms.push(room);
 
