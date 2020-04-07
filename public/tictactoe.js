@@ -33,10 +33,10 @@
     ws.onmessage = function(e) {
       //console.log(e.data);
       let action = JSON.parse(e.data);
-
       //console.log(action.type);
 
-      if (action.type === 'create room') {
+      switch (action.type) {
+      case 'create room': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -52,8 +52,9 @@
 	document.getElementById('mark').textContent = '';
 	let markText = document.createTextNode(`Your mark is ${mark}`);
 	document.getElementById('mark').appendChild((markText));
-
-      } else if (action.type === 'second user access') {
+	break;
+      }
+      case 'second user access': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -62,8 +63,9 @@
 	    document.createTextNode(`Your turn`) :
 	    document.createTextNode(`Opponent's turn`);
 	document.getElementById('status').appendChild((status));
-
-      } else if (action.type === 'join existing room') {
+	break;
+      }
+      case 'join existing room': {
 	mark = action.room.users[0].mark === 'X' ? 'O' : 'X';
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
@@ -85,8 +87,9 @@
 	document.getElementById('mark').textContent = '';
 	let markText = document.createTextNode(`Your mark is ${mark}`);
 	document.getElementById('mark').appendChild((markText));
-
-      } else if (action.type === 'update') {
+	break;
+      }
+      case 'update': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -135,9 +138,9 @@
 	  document.getElementById('status').appendChild((status));
 	  document.getElementById('status').appendChild((link));
 	}
-
-
-      } else if (action.type === 'resetBoard') {
+	break;
+      }
+      case 'resetBoard': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -146,13 +149,19 @@
 	    document.createTextNode("New game! It's your turn!"):
 	    document.createTextNode("New game! It's your opponent's turn");
 	document.getElementById('status').appendChild((status));
-      } else if (action.type === 'room number error') {
+	break;
+      }
+      case 'room number error': {
 	document.querySelector('.modal-bg').style.display = '';//display modal window again
 	document.getElementById('error-message').textContent = 'Please, insert a number';
-      } else if (action.type === 'room full') {
+	break;
+      }
+      case 'room full': {
 	document.querySelector('.modal-bg').style.display = '';
 	document.getElementById('error-message').textContent = 'Room full, try another number.';
-      } else if (action.type === 'userLeft') {
+	break;
+      }
+      case 'userLeft': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -160,6 +169,9 @@
 	let status = document.createTextNode('Opponent left. Waiting for opponent.');
 	document.getElementById('status').appendChild((status));
       }
+      default: {
+	console.log('action not known.');
+      }}
     };
 
     function renderBoard(moves) {
