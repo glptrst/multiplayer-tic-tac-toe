@@ -2,7 +2,7 @@
 
   // If there is a winner, return obj with winner mark and positions.
   // Return null otherwise.
-  exports.winner = function(board) {
+  const winner = function(board) {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -23,7 +23,10 @@
   };
 
   // If it's a draw, return true, otherwise false.
-  exports.draw = function(board) {
+  const draw = function(board) {
+    if (winner(board))
+      return false;
+
     let emptyCells = board.filter((c) => {
       if (!c)
 	return true;
@@ -36,5 +39,8 @@
     else
       return false;
   };
+
+  exports.winner = winner;
+  exports.draw = draw;
 
 }(typeof exports === 'undefined' ? this.functions = {} : exports));

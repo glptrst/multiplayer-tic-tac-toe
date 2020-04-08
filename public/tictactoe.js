@@ -70,9 +70,6 @@
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
-	console.log(`mark: ${mark}`);
-	console.log(`next: ${action.room.next}`);
-
 	document.getElementById('status').textContent = '';
 	let status = mark === action.room.next ?
 	    document.createTextNode(`Your turn`) :
