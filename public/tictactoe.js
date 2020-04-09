@@ -102,11 +102,12 @@
 
 	  document.getElementById('status').textContent = '';
 	  let status = functions.winner(action.room.board.cells).mark === mark ?
-	      document.createTextNode(`${"You won!"}`) :
-	      document.createTextNode(`${"You lost!"}`);
+	      document.createTextNode(`${"You won! "}`) :
+	      document.createTextNode(`${"You lost! "}`);
 
 	  let link = document.createElement('span');
 	  let linkTxt = document.createTextNode('Click here to start a new game');
+	  link.style.cursor = 'pointer';
 	  link.appendChild(linkTxt);
 	  link.addEventListener('click', () => {
 	    ws.send(JSON.stringify({
