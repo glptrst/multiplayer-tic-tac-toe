@@ -9,8 +9,8 @@ const WebSocket = require('ws');
 /* HTTP SERVER */
 /*             */
 const server = http.createServer((req, res) => {
-  //console.log(req.url);
-  if (req.url === '/') {
+  switch (req.url) {
+  case '/': {
     fs.readFile('./public/index.html', (err, page) => {
       if (err) {
 	res.writeHead(404);
@@ -20,7 +20,9 @@ const server = http.createServer((req, res) => {
       res.writeHead(200);
       res.end(page);
     });
-  } else if (req.url === '/tictactoe.js') {
+    break;
+  }
+  case '/tictactoe.js': {
     fs.readFile('./public/tictactoe.js', (err, script) => {
       if (err) {
 	res.writeHead(404);
@@ -32,7 +34,9 @@ const server = http.createServer((req, res) => {
       });
       res.end(script);
     });
-  } else if (req.url === '/modules/functions.js') {
+    break;
+  }
+  case '/modules/functions.js': {
     fs.readFile('./modules/functions.js', (err, script) => {
       if (err) {
 	res.writeHead(404);
@@ -44,7 +48,9 @@ const server = http.createServer((req, res) => {
       });
       res.end(script);
     });
-  } else if (req.url === '/style.css') {
+    break;
+  }
+  case '/style.css': {
     fs.readFile('./public/style.css', (err, style) => {
       if (err) {
 	res.writeHead(404);
@@ -56,10 +62,12 @@ const server = http.createServer((req, res) => {
       });
       res.end(style);
     });
-  } else {
+    break;
+  }
+  default: {
     res.writeHead(404);
     res.end('Nothing here\n');
-  }
+  }}
 });
 
 server.listen(process.env.PORT || 9898);
@@ -88,18 +96,24 @@ wss.on('connection', (ws) => {
 
   ws.on('message', (req) => {
     req = JSON.parse(req);
-    //console.log(req.type);
-    if (req.type === 'connection') {
+    switch (req.type) {
+    case 'connection': {
       connect(ws, req.roomNumber);
-    } else if (req.type === 'move')  {
+      break;
+    }
+    case 'move':  {
       let room = roomExists(rooms, req.roomNumber);
       makeMove(ws, room, req.cell);
-    } else if (req.type === 'newGame') {
+      break;
+    }
+    case 'newGame': {
       let room = roomExists(rooms, req.roomNumber);
       startNewGame(room);
-    } else {
-      console.log('? 1');
+      break;
     }
+    default: {
+      console.log('? 1');
+    }}
   });
 
   ws.on('close', (e) => {

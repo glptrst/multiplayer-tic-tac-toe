@@ -31,9 +31,7 @@
       }));
     };
     ws.onmessage = function(e) {
-      //console.log(e.data);
       let action = JSON.parse(e.data);
-      //console.log(action.type);
 
       switch (action.type) {
       case 'create room': {
