@@ -208,11 +208,10 @@ function disconnectUser(ws) {
       if (rooms[i].users[0].ws === ws) {
 	rooms.splice(i, 1);
       }
-    } else if (rooms[i].users.length === 2) {
-      if (rooms[i].users[0].ws === ws)
-	rooms[i] = rooms[i].update({users: [rooms[i].users.slice().pop()]});
-      else if (rooms[i].users[1].ws === ws)
-	rooms[i] = rooms[i].update({users: [rooms[i].users.slice().shift()]});
+    } else {
+      rooms[i] = rooms[i].update({
+	users: rooms[i].users.filter((u) => !(u.ws === ws))
+      });
 
       rooms[i] = rooms[i].update({board: Board.empty()});
       rooms[i].users[0].ws.send(JSON.stringify({

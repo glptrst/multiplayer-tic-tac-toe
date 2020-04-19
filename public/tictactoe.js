@@ -164,9 +164,10 @@
 	document.getElementById('status').textContent = '';
 	let status = document.createTextNode('Opponent left. Waiting for opponent.');
 	document.getElementById('status').appendChild((status));
+	break;
       }
       default: {
-	console.log('action not known.');
+	console.log(`action not known: ${action.type}`);
       }}
     };
 
