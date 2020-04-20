@@ -8,7 +8,7 @@ const WebSocket = require('ws');
 /*             */
 /* HTTP SERVER */
 /*             */
-const server = http.createServer((req, res) => {
+const httpServer = http.createServer((req, res) => {
 
   let filePath = '.' + req.url;
   if (filePath === './')
@@ -58,7 +58,7 @@ const server = http.createServer((req, res) => {
 /*                  */
 /* WEBSOCKET SERVER */
 /*                  */
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ httpServer });
 
 let rooms = [
   // {
