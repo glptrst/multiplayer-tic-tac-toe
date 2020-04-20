@@ -1,76 +1,59 @@
 'use strict';
-const functions = require('./modules/functions.js');
+const functions = require('./public/modules/functions.js');
 const http = require('http');
 const fs = require('fs');
-
+const path = require('path');
 const WebSocket = require('ws');
 
 /*             */
 /* HTTP SERVER */
 /*             */
 const server = http.createServer((req, res) => {
-  switch (req.url) {
-  case '/': {
-    fs.readFile('./public/index.html', (err, page) => {
-      if (err) {
-	res.writeHead(404);
-	res.end(JSON.stringify(err));
-	return;
-      }
-      res.writeHead(200);
-      res.end(page);
-    });
-    break;
-  }
-  case '/tictactoe.js': {
-    fs.readFile('./public/tictactoe.js', (err, script) => {
-      if (err) {
-	res.writeHead(404);
-	res.end(JSON.stringify(err));
-	return;
-      }
-      res.writeHead(200, {
-	'Content-Type': 'text/javscript'
-      });
-      res.end(script);
-    });
-    break;
-  }
-  case '/modules/functions.js': {
-    fs.readFile('./modules/functions.js', (err, script) => {
-      if (err) {
-	res.writeHead(404);
-	res.end(JSON.stringify(err));
-	return;
-      }
-      res.writeHead(200, {
-	'Content-Type': 'text/javscript'
-      });
-      res.end(script);
-    });
-    break;
-  }
-  case '/style.css': {
-    fs.readFile('./public/style.css', (err, style) => {
-      if (err) {
-	res.writeHead(404);
-	res.end(JSON.stringify(err));
-	return;
-      }
-      res.writeHead(200, {
-	'Content-Type': 'text/css'
-      });
-      res.end(style);
-    });
-    break;
-  }
-  default: {
-    res.writeHead(404);
-    res.end('Nothing here\n');
-  }}
-});
 
-server.listen(process.env.PORT || 9898);
+  let filePath = '.' + req.url;
+  if (filePath === './')
+    filePath = './index.html';
+
+  let extname = String(path.extname(filePath)).toLowerCase();
+
+  let mimeTypes = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+    '.wav': 'audio/wav',
+    '.mp4': 'video/mp4',
+    '.woff': 'application/font-woff',
+    '.ttf': 'application/font-ttf',
+    '.eot': 'application/vnd.ms-fontobject',
+    '.otf': 'application/font-otf',
+    '.wasm': 'application/wasm'
+  };
+
+  let contentType = mimeTypes[extname] || 'application/octet-stream';
+
+  fs.readFile('./public/' + filePath, (error, content) => {
+    if (error) {
+      if (error.code === 'ENOENT') {
+	fs.readFile('./404.html', (error) => {
+	  res.writeHead(404, {'Content-Type': 'text/html'});
+	  res.end(content, 'utf-8');
+	});
+      } else {
+	res.write(500);
+	res.end(`Error: ${error.code}\n`);
+      }
+    } else {
+      res.writeHead(200, {'Content-Type': contentType});
+      res.end(content, 'utf-8');
+    }
+  });
+
+}).listen(process.env.PORT || 9898);
 
 /*                  */
 /* WEBSOCKET SERVER */
