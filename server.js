@@ -207,10 +207,7 @@ function disconnectUser(ws) {
 
 function roomExists(rooms, number) {
   return rooms.filter((room) => {
-    if (room.number === number)
-      return true;
-    else
-      return false;
+    return room.number === number;
   })[0];
 };
 
