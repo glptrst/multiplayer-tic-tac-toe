@@ -2,7 +2,6 @@
 const functions = require('./public/modules/functions.js');
 const http = require('http');
 const fs = require('fs');
-const path = require('path');
 const WebSocket = require('ws');
 
 const server = http.createServer((req, res) => {
@@ -92,7 +91,13 @@ let rooms = [
 wss.on('connection', (ws) => {
 
   ws.on('message', (req) => {
-    req = JSON.parse(req);
+    try {
+      req = JSON.parse(req);
+    } catch(e) {
+      console.log(e);
+      return;
+    }
+
     switch (req.type) {
     case 'connection': {
       connect(ws, req.roomNumber);
