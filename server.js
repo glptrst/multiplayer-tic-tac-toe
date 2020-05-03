@@ -172,7 +172,12 @@ function connect(ws, roomNumber) {
 }
 
 function makeMove(ws, room, cell) {
-  let user = room.users.filter(u => u.ws === ws)[0];
+  let user;
+  try {
+    user = room.users.filter(u => u.ws === ws)[0];
+  } catch(e) {
+    console.log(e);
+  }
   if (room && room.users.length === 2 && room.board.cells[cell] === null &&
       room.next === user.mark &&
       !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
