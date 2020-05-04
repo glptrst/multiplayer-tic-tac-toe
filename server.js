@@ -93,33 +93,35 @@ wss.on('connection', (ws) => {
   ws.on('message', (req) => {
     try {
       req = JSON.parse(req);
+      switch (req.type) {
+      case 'connection': {
+	connect(ws, req.roomNumber);
+	break;
+      }
+      case 'move':  {
+	let room = roomExists(rooms, req.roomNumber);
+	makeMove(ws, room, req.cell);
+	break;
+      }
+      case 'newGame': {
+	let room = roomExists(rooms, req.roomNumber);
+	startNewGame(room);
+	break;
+      }
+      default: {
+	console.log('? 1');
+      }}
     } catch(e) {
       console.log(e);
-      return;
     }
-
-    switch (req.type) {
-    case 'connection': {
-      connect(ws, req.roomNumber);
-      break;
-    }
-    case 'move':  {
-      let room = roomExists(rooms, req.roomNumber);
-      makeMove(ws, room, req.cell);
-      break;
-    }
-    case 'newGame': {
-      let room = roomExists(rooms, req.roomNumber);
-      startNewGame(room);
-      break;
-    }
-    default: {
-      console.log('? 1');
-    }}
   });
 
   ws.on('close', (e) => {
-    disconnectUser(ws);
+    try {
+      disconnectUser(ws);
+    } catch(e) {
+      console.log(e);
+    }
   });
 
 });
@@ -172,12 +174,7 @@ function connect(ws, roomNumber) {
 }
 
 function makeMove(ws, room, cell) {
-  let user;
-  try {
-    user = room.users.filter(u => u.ws === ws)[0];
-  } catch(e) {
-    console.log(e);
-  }
+  let  user = room.users.filter(u => u.ws === ws)[0];
   if (room && room.users.length === 2 && room.board.cells[cell] === null &&
       room.next === user.mark &&
       !functions.draw(room.board.cells) && !functions.winner(room.board.cells)) {
