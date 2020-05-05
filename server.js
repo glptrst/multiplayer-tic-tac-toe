@@ -105,7 +105,7 @@ wss.on('connection', (ws) => {
       }
       case 'newGame': {
 	let room = roomExists(rooms, req.roomNumber);
-	startNewGame(room);
+	startNewGame(room, ws);
 	break;
       }
       default: {
@@ -192,18 +192,24 @@ function makeMove(ws, room, cell) {
   }
 }
 
-function startNewGame(room) {
-  let updatedRoom = room.update({board: Board.empty()});
-  rooms = rooms.filter((r) => r.number !== room.number);
-  room = updatedRoom;
-  rooms.push(room);
+function startNewGame(room, ws) {
+  let user = room.users.filter((u) => {
+    return u.ws === ws;
+  })[0];
 
-  room.users.forEach((u) => {
-    u.ws.send(JSON.stringify({
-      type: 'resetBoard',
-      room: room.hideWs()
-    }));
-  });
+  if (user) {
+    let updatedRoom = room.update({board: Board.empty()});
+    rooms = rooms.filter((r) => r.number !== room.number);
+    room = updatedRoom;
+    rooms.push(room);
+
+    room.users.forEach((u) => {
+      u.ws.send(JSON.stringify({
+	type: 'resetBoard',
+	room: room.hideWs()
+      }));
+    });
+  }
 }
 
 function disconnectUser(ws) {
