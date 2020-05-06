@@ -138,10 +138,9 @@ function connect(ws, roomNumber) {
 
   if (!room) {
     room = new Room( roomNumber,
-		     [{ws: ws, mark: 'X'}],
+		     [new User(ws, 'X')],
 		     Board.empty(),
-		     'X',
-		     null );
+		     'X' );
     rooms.push(room);
     ws.send(JSON.stringify({
       type: 'create room',
@@ -149,7 +148,9 @@ function connect(ws, roomNumber) {
     }));
   } else {
     if (room.users.length === 1) {
-      let updatedRoom = room.update({users: [room.users[0], {ws: ws, mark: room.users[0].mark === 'X' ? 'O' : 'X'}]});
+      let updatedRoom = room.update({
+	users: [room.users[0], new User(ws, room.users[0].mark === 'X' ? 'O' : 'X')]
+      });
 
       rooms = rooms.filter((r) => r.number !== room.number);
       room = updatedRoom;
@@ -278,5 +279,12 @@ class Board {
     let cells = this.cells.slice();
     cells[cell] = value;
     return new Board(cells);
+  }
+}
+
+class User {
+  constructor(ws, mark) {
+    this.ws = ws;
+    this.mark = mark;
   }
 }
