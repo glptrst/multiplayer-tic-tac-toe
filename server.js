@@ -221,10 +221,11 @@ function disconnectUser(ws) {
       }
     } else {
       rooms[i] = rooms[i].update({
-	users: rooms[i].users.filter((u) => !(u.ws === ws))
+	users: rooms[i].users.filter((u) => !(u.ws === ws)),
+	board: Board.empty()
       });
 
-      rooms[i] = rooms[i].update({board: Board.empty()});
+      // rooms[i] = rooms[i].update({board: Board.empty()});
       rooms[i].users[0].ws.send(JSON.stringify({
 	type: 'userLeft',
 	room: rooms[i].hideWs()
