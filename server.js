@@ -129,7 +129,7 @@ wss.on('connection', (ws) => {
 function connect(ws, roomNumber) {
   if (! /^\d+$/.exec(roomNumber)) {//check whether input is a number
     ws.send(JSON.stringify({
-      type: 'room number error'
+      type: 'roomNumberError'
     }));
     return;
   }
@@ -143,7 +143,7 @@ function connect(ws, roomNumber) {
 		     'X' );
     rooms.push(room);
     ws.send(JSON.stringify({
-      type: 'create room',
+      type: 'createRoom',
       room: room.hideWs()
     }));
   } else {
@@ -156,19 +156,19 @@ function connect(ws, roomNumber) {
       room = updatedRoom;
       rooms.push(room);
       room.users[0].ws.send(JSON.stringify({ //an opponent is joining the client's room
-	type: 'second user access',
+	type: 'secondUserAccess',
 	room: room.hideWs()
       }));
 
       room.users[1].ws.send(JSON.stringify( //client is joining an opponent's room
 	{
-	  type: 'join existing room',
+	  type: 'joinExistingRoom',
 	  room: room.hideWs()
 	}
       ));
     } else {
       ws.send(JSON.stringify({
-	type: 'room full'
+	type: 'roomFull'
       }));
     }
   }

@@ -34,7 +34,7 @@
       let action = JSON.parse(e.data);
 
       switch (action.type) {
-      case 'create room': {
+      case 'createRoom': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -52,7 +52,7 @@
 	document.getElementById('mark').appendChild((markText));
 	break;
       }
-      case 'second user access': {
+      case 'secondUserAccess': {
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
@@ -63,7 +63,7 @@
 	document.getElementById('status').appendChild((status));
 	break;
       }
-      case 'join existing room': {
+      case 'joinExistingRoom': {
 	mark = action.room.users[0].mark === 'X' ? 'O' : 'X';
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
@@ -147,12 +147,12 @@
 	document.getElementById('status').appendChild((status));
 	break;
       }
-      case 'room number error': {
+      case 'roomNumberError': {
 	document.querySelector('.modal-bg').style.display = '';//display modal window again
 	document.getElementById('error-message').textContent = 'Please, insert a number';
 	break;
       }
-      case 'room full': {
+      case 'roomFull': {
 	document.querySelector('.modal-bg').style.display = '';
 	document.getElementById('error-message').textContent = 'Room full, try another number.';
 	break;
