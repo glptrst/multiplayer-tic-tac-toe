@@ -64,7 +64,6 @@
 	break;
       }
       case 'joinExistingRoom': {
-	mark = action.room.users[0].mark === 'X' ? 'O' : 'X';
 	document.getElementById('board').textContent = '';
 	document.getElementById('board').appendChild(renderBoard(action.room.board.cells));
 
