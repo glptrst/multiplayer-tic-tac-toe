@@ -120,7 +120,7 @@
 
 	if (functions.draw(action.room.board.cells)) {
 	  document.getElementById('status').textContent = '';
-	  let status = document.createTextNode("It's a draw!");
+	  let status = document.createTextNode("It's a draw! ");
 	  let link = document.createElement('span');
 	  let linkTxt = document.createTextNode('Click here to start a new game');
 	  link.style.cursor = 'pointer';
